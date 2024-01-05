@@ -7,18 +7,31 @@ const {
 } = require("sequelize")
 const Admin = sequelize.define(
     'Admin', {
-        loginId: {
+        uTel: {
             type: DataTypes.STRING,
             allowNull: false
         },
-        loginPwd: {
+        uPwd: {
             type: DataTypes.STRING,
             allowNull: false
         },
-        name: {
+        uName: {
             type: DataTypes.STRING,
             allowNull: false
-        }
+        },
+        uRank:{
+            type:DataTypes.STRING,
+            allowNull:false
+        },
+        uBirth:{
+            type:DataTypes.STRING,
+            allowNull:false
+        },
+        uDep:{
+            type:DataTypes.STRING,
+            allowNull:false
+        },
+
     }, {
         tableName:"Admin",
         createdAt: true, // 创建时间

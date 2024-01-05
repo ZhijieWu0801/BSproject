@@ -7,15 +7,15 @@ const {
 } = require("sequelize")
 const NowMuster = sequelize.define(
     'NowMuster', {
-        name: {
+        mName: {
             type: DataTypes.STRING,
             allowNull: false
         },
-        phone: {
+        mTel: {
             type: DataTypes.STRING(11),
             allowNull: false
         },
-        address: {
+        mAddress: {
             type: DataTypes.STRING,
             allowNull: false
         },

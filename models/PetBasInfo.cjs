@@ -7,25 +7,29 @@ const {
 } = require("sequelize")
 const PetBasInfo = sequelize.define(
     'PetBasInfo', {
-        petName: {
+        pName: {
             type: DataTypes.STRING,
             allowNull: false
         },
-        petSex: {
+        pSex: {
             type: DataTypes.BOOLEAN,
             allowNull: false
         },
-        petBreed: {
-            type: DataTypes.STRING,
-            allowNull: false
-        },
-        petBrth:{
+        pBirth:{
             type:DataTypes.DATE,
             allowNull:false
         },
-        petImg:{
+        pImg:{
             type: DataTypes.STRING
-        }
+        },
+        pNum:{
+            type: DataTypes.STRING,
+            allowNull:false
+        },
+        pBreed: {
+            type: DataTypes.STRING,
+            allowNull: false
+        },
     }, {
         tableName:"PetBasInfo",
         createdAt: true, // 创建时间
