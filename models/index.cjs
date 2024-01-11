@@ -23,36 +23,36 @@ const {
     signIn,
     getTel
 } = require("../services/adminServes.cjs")
-app.listen(3000, () => {
-    console.log("监听3000");
-})
-app.all('/test', async (req, res) => {
-    console.log(2222);
-    const ins = await addAdmin({
-        cTel: "18580528916",
-        uName: "ccc2",
-        uRank: "0001",
-        uPwd: "123456",
-        uTel: '18580528920',
-        uBirth: "2000-08-01",
-        uDep: "0"
-    })
-    res.send({
-        status: 0,
-        message: "okkkk",
-        data: JSON.parse(ins)
-    })
-    console.log(111111);
-})
+// app.listen(3000, () => {
+//     console.log("监听3000");
+// })
+// app.all('/test', async (req, res) => {
+//     console.log(2222);
+//     const ins = await addAdmin({
+//         cTel: "18580528916",
+//         uName: "ccc2",
+//         uRank: "0001",
+//         uPwd: "123456",
+//         uTel: '18580528920',
+//         uBirth: "2000-08-01",
+//         uDep: "0"
+//     })
+//     res.send({
+//         status: 0,
+//         message: "okkkk",
+//         data: JSON.parse(ins)
+//     })
+//     console.log(111111);
+// })
 
-app.all("/test/deleteAdmin",async (req,res)=>{
-    console.log("req==>",req);
-    console.log("res==>",res);
-    return await deleteAdmin({
-        cTel: req.cTel,
-        uTel: req.uTel
-    })
-})
+// app.all("/test/deleteAdmin",async (req,res)=>{
+//     console.log("req==>",req);
+//     console.log("res==>",res);
+//     return await deleteAdmin({
+//         cTel: req.cTel,
+//         uTel: req.uTel
+//     })
+// })
 // app.get("/test",async )
 // const Admin = require('./admin.cjs')
 // const ins = Admin.build({
@@ -95,3 +95,22 @@ app.all("/test/deleteAdmin",async (req,res)=>{
 // getTel("18580528910").then((r)=>{
 //     console.log(r);
 // })
+const {
+    addPet,
+    updatePet,
+    deletePet
+} = require('../services/petServes.cjs')
+// addPet({
+//     uTel: '18580528916',
+//     pName: '小花',
+//     pBreed: '狗',
+// }).then(r => {
+//     console.log(r);
+// })
+updatePet({uTel:'18580528916',update:{
+    id:3,
+    pName: '小小花',
+    pBreed: '狗',
+}}).then((r)=>{
+    console.log(r);
+})

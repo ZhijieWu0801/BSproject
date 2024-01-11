@@ -1,5 +1,4 @@
-const express = require('express')
-const app = express()
+const {app} = require("./expressApp.cjs")
 const {
     addAdmin,
     updateAdmin,
@@ -7,9 +6,9 @@ const {
     login,
     signIn,
 } = require("./adminServes.cjs")
-app.listen(3000, () => { 
-    console.log("监听3000");
-})
+// app.listen(3000, () => { 
+//     console.log("监听3000");
+// })
 app.all('/addAdmin', async (req, res) => {
     console.log('参数', req.query);
     try {
@@ -233,3 +232,6 @@ app.all('/updateOur', async (req, res) => {
         });
     }
 });
+app.all('/addPet',async (req,res)=>{
+
+})

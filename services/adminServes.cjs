@@ -1,10 +1,6 @@
-const {
-    Op
-} = require("sequelize");
-//有关操作admin表的操作
-const md5 = require("md5")
-const Admin = require("../models/admin.cjs")
 
+// //有关操作admin表的操作
+const {Op,Admin,md5} = require('./servicesComon.cjs')
 //获取权限的方法，返回权限的代码如 0001
 exports.getRank = async (uTel) => {
     const ins = await Admin.findOne({
@@ -117,7 +113,6 @@ exports.getAdminByUTel = async (uTel) => {
             uTel
         }
     })
-    // console.log(find.toJSON());
     return inside ? ins.toJSON() : "未找到账号"
 }
 exports.login = async (obj) => {
@@ -165,3 +160,4 @@ exports.signIn = async (obj) => {
     })
     return "成功创建账号"
 }
+
