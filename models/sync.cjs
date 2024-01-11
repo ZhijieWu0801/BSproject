@@ -12,3 +12,4 @@ const sequelize = require('./db.cjs')
 sequelize.sync({alter:true}).then(()=>{
     console.log("所有模型同步完成");
 })
+

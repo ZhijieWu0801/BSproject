@@ -21,15 +21,15 @@ const Admin = sequelize.define(
         },
         uRank:{
             type:DataTypes.STRING,
-            allowNull:false
+            allowNull:true
         },
         uBirth:{
             type:DataTypes.STRING,
-            allowNull:false
+            allowNull:true
         },
         uDep:{
             type:DataTypes.STRING,
-            allowNull:false
+            allowNull:true
         },
 
     }, {

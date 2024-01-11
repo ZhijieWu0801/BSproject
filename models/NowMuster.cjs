@@ -15,6 +15,10 @@ const NowMuster = sequelize.define(
             type: DataTypes.STRING(11),
             allowNull: false
         },
+        mPwd: {
+            type: DataTypes.STRING(11),
+            allowNull: false
+        },
         mAddress: {
             type: DataTypes.STRING,
             allowNull: false
