@@ -1,4 +1,4 @@
-const {operable,Op,Pet,Admin} = require("./servicesComon.cjs")
+const {operable,Op,Pet,Admin} = require("../routers/servicesComon.cjs")
 //获取权限的方法，返回权限的代码如 0001
 exports.getRank = async (uTel) => {
     const ins = await Admin.findOne({

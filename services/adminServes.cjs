@@ -1,6 +1,6 @@
 
 // //有关操作admin表的操作
-const {Op,Admin,md5} = require('./servicesComon.cjs')
+const {Op,Admin,md5} = require('../routers/servicesComon.cjs')
 //获取权限的方法，返回权限的代码如 0001
 exports.getRank = async (uTel) => {
     const ins = await Admin.findOne({
@@ -11,7 +11,7 @@ exports.getRank = async (uTel) => {
     const uRank = ins ? ins.toJSON().uRank : "0000"
     // console.log(uRank);
     return uRank
-}
+} 
 // 判断电话是否被注册 返回 true / false
 exports.getTel = async (uTel) => {
     const ins = await Admin.findOne({

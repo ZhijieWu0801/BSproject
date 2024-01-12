@@ -1,15 +1,17 @@
-const {app} = require("./expressApp.cjs")
+// const {app} = require("../services/expressApp.cjs")
+const {app} = require("./servicesComon.cjs")
+
 const {
     addAdmin,
     updateAdmin,
     deleteAdmin,
     login,
     signIn,
-} = require("./adminServes.cjs")
+} = require("../services/adminServes.cjs")
 // app.listen(3000, () => { 
 //     console.log("监听3000");
 // })
-app.all('/addAdmin', async (req, res) => {
+app.all('/api/admin/addAdmin', async (req, res) => {
     console.log('参数', req.query);
     try {
         const ins = await addAdmin({
@@ -45,8 +47,8 @@ app.all('/addAdmin', async (req, res) => {
 
     // console.log(111111);
 })
-app.all('/login', async (req, res) => {
-    console.log('参数', req.query);
+app.all('/api/admin/login', async (req, res) => {
+    console.log('参数',req.query);
     try {
         const ins = await login({
             uPwd: req.query.uPwd,
@@ -59,11 +61,13 @@ app.all('/login', async (req, res) => {
                 message: "okk",
                 data
             })
+            res.end()
         } catch {
             res.send({
                 status: 0,
                 message: ins,
-                data: {}
+                data: {},
+                
             })
         }
     } catch {
@@ -74,7 +78,7 @@ app.all('/login', async (req, res) => {
         })
     }
 })
-app.all('/signIn', async (req, res) => {
+app.all('/api/admin/signIn', async (req, res) => {
     console.log('参数', req.query);
     try {
         const ins = await signIn({
@@ -109,7 +113,7 @@ app.all('/signIn', async (req, res) => {
 
     // console.log(111111);
 })
-app.all('/deleteAdmin', async (req, res) => {
+app.all('/api/admin/deleteAdmin', async (req, res) => {
     console.log('参数', req.query);
     try {
         const ins = await deleteAdmin({
@@ -175,7 +179,7 @@ app.all('/deleteAdmin', async (req, res) => {
 
 //     // console.log(111111);
 // })
-app.all('/updateAdmin', async (req, res) => {
+app.all('/api/admin/updateAdmin', async (req, res) => {
     console.log('参数', req.query);
     try {
         const ins = await updateAdmin({
@@ -204,7 +208,7 @@ app.all('/updateAdmin', async (req, res) => {
         });
     }
 });
-app.all('/updateOur', async (req, res) => {
+app.all('/api/admin/updateOur', async (req, res) => {
     console.log('参数', req.query);
     try {
         const ins = await updateOur({
@@ -232,6 +236,6 @@ app.all('/updateOur', async (req, res) => {
         });
     }
 });
-app.all('/addPet',async (req,res)=>{
+app.all('/api/admin/addPet',async (req,res)=>{
 
 })
