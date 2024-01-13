@@ -1,6 +1,9 @@
-
 // //有关操作admin表的操作
-const {Op,Admin,md5} = require('../routers/servicesComon.cjs')
+const {
+    Op,
+    Admin,
+    md5
+} = require('../routers/servicesComon.cjs')
 //获取权限的方法，返回权限的代码如 0001
 exports.getRank = async (uTel) => {
     const ins = await Admin.findOne({
@@ -11,7 +14,7 @@ exports.getRank = async (uTel) => {
     const uRank = ins ? ins.toJSON().uRank : "0000"
     // console.log(uRank);
     return uRank
-} 
+}
 // 判断电话是否被注册 返回 true / false
 exports.getTel = async (uTel) => {
     const ins = await Admin.findOne({
@@ -26,12 +29,12 @@ exports.getTel = async (uTel) => {
 exports.addAdmin = async (obj) => {
     // console.log(this.getRank(obj.uTel));
     const isFind = await Admin.findOne({
-        where:{
-            uTel:obj.cTel
+        where: {
+            uTel: obj.cTel
         }
     })
     console.log(isFind);
-    if(!isFind){
+    if (!isFind) {
         return "管理员用户未找到"
     }
     if (await this.getRank(obj.cTel) != "0001") {
@@ -47,10 +50,10 @@ exports.addAdmin = async (obj) => {
 }
 exports.deleteAdmin = async (obj) => {
     if (await this.getRank(obj.cTel) != "0001") {
-        return "权限不足"
+        return new Error("权限不足")
     }
-    if(!(await this.getTel(obj.uTel))){
-        return "未找到用户"
+    if (!(await this.getTel(obj.uTel))) {
+        return new Error("未找到用户")
     }
     const ins = await Admin.destroy({
         where: {
@@ -62,10 +65,10 @@ exports.deleteAdmin = async (obj) => {
 }
 exports.updateAdmin = async (obj) => {
     if (await this.getRank(obj.cTel) != "0001") {
-        return "权限不足"
+        return new Error("权限不足")
     }
-    if(!(await this.getTel(obj.uTel))){
-        return "未找到用户"
+    if (!(await this.getTel(obj.uTel))) {
+        return new Error("未找到用户")
     }
     // const select = await Admin.findOne({
     //     where: {
@@ -86,19 +89,10 @@ exports.updateAdmin = async (obj) => {
     return ins
 }
 exports.updateOur = async (obj) => {
-    if(!(await this.getTel(obj.uTel))){
-        return "未找到用户"
+    if (!(await this.getTel(obj.uTel))) {
+        return new Error("未找到用户")
     }
-    // const select = await Admin.findOne({
-    //     where: {
-    //         uTel: obj.uTel
-    //     }
-    // })
-    // if (select === null) {
-    //     return '未找到该管理员'
-    // }
-    // obj.uPwd && (obj.uPwd = md5(obj.uPwd))
-    console.log(obj);
+    obj.uPwd = md5(obj.uPwd)
     const ins = await Admin.update(obj, {
         where: {
             uTel: obj.uTel
@@ -117,6 +111,11 @@ exports.getAdminByUTel = async (uTel) => {
 }
 exports.login = async (obj) => {
     obj.uPwd = md5(obj.uPwd)
+    console.log(obj.uTel);
+    if (!await this.getTel(obj.uTel)) {
+        console.log(222);
+        return new Error("账号不存在")
+    }
     let ins = await Admin.findOne({
         where: {
             [Op.and]: [{
@@ -129,7 +128,7 @@ exports.login = async (obj) => {
         }
     })
     if (ins === null) {
-        return '账号或密码错误'
+        return new Error('密码错误')
     }
     // 删除密码字段
     ins = ins.toJSON()
@@ -139,7 +138,7 @@ exports.signIn = async (obj) => {
     console.log(obj);
     const useTel = await this.getTel(obj.uTel)
     if (useTel) {
-        return "手机号已被注册"
+        return new Error("手机号已被注册")
     }
     let ins = await Admin.findOne({
         where: {
@@ -147,7 +146,8 @@ exports.signIn = async (obj) => {
         }
     })
     if (ins && ins.uTel === obj.uTel) {
-        return console.log("账号已存在");
+        return new Error("账号已存在")
+
     }
     obj.uPwd = md5(obj.uPwd)
     await Admin.create({
@@ -160,4 +160,3 @@ exports.signIn = async (obj) => {
     })
     return "成功创建账号"
 }
-

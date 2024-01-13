@@ -1,15 +1,23 @@
-<script setup>
+<script>
 import { ref } from 'vue'
+import { useStore } from 'vuex'
+export default{
+  setup(){
 
-defineProps({
-  msg: String,
-})
+    const store = useStore()
+    console.log(store.getters.getIsLogin,111);
+    const isLogin = store.getters.getIsLogin
+    console.log(isLogin);
+    return{
+      isLogin
+    }
+  },
+}
 
-const count = ref(0)
 </script>
 
 <template>
-  <h1>{{ msg }}</h1>
+  <h1>{{ isLogin }}</h1>
 
   <div class="card">
     <button type="button" @click="count++">count is {{ count }}</button>

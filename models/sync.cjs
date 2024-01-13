@@ -2,6 +2,7 @@
 require("./admin.cjs")
 require("./PetBasInfo.cjs")
 require("./NowMuster.cjs")
+require("./functionList.cjs")
 
 const PetBasInfo = require("./PetBasInfo.cjs")
 const NowMuster = require("./NowMuster.cjs")
