@@ -11,8 +11,10 @@ import
     routes
  from "./routes/routes.js"
  import store from './store'
+ import ElementPlus from 'element-plus' //全局引入
+ import 'element-plus/dist/index.css'
 const router = createRouter({
     history: createWebHistory(),
     routes:routes.routes
 });
-createApp(App).use(router).use(store).mount('#app')
+createApp(App).use(router).use(ElementPlus).use(store).mount('#app')

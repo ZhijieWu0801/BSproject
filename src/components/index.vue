@@ -1,11 +1,10 @@
 <template>
   <login v-if="!isLogin"/>
-  <!-- <div>{{ !!isLogin }}</div> -->
 </template>
 
 <script>
 import { ref, provide, watch } from "vue";
-import login from './login.vue'
+import login from './Login.vue'
 export default {
     components:{
         login

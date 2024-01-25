@@ -10,12 +10,12 @@
 import { ref, inject } from "vue";
 import { useRouter} from "vue-router"
 import { useStore } from 'vuex'
+import baseUrl from '../comoneJS/baseUrl.js'
 export default {
   setup() {
     const router = useRouter()
     const uTel = ref("");
     const uPwd = ref("");
-    const baseUrl= "http://127.0.0.1:3000"
     const store = useStore()
     let isLogin = inject("isLogin")
     function login() {
@@ -33,6 +33,7 @@ export default {
           isLogin = true
           store.commit("setIsLogin",isLogin)
           console.log(store.getters.getIsLogin,1111);
+          localStorage.setItem("islogin",true)
           router.push("/home")
         }
         console.log(r);
@@ -42,14 +43,16 @@ export default {
     return {
       uTel: uTel.ref,
       uPwd: uPwd.ref,
-      isLogin: isLogin.ref,
+      isLogin: isLogin,
       login
     };
   },
   data() {
     return {
-      // baseUrl: "http://127.0.0.1:3000",
     };
+  },
+  mounted(){
+    window.getiii = this.$store.getters.getIsLogin
   },
   methods: {
     

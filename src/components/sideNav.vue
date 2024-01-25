@@ -6,32 +6,58 @@
         v-for="(item, index) in navItem"
         :key="index"
         :class="{ navActive: activeItem === index }"
-        @click="itemClickHandle(index)"
-      >{{item.functionName}}</li>
+        @click="itemClickHandle(item,index)"
+      >{{item.name}}</li>
     </ul>
+
   </div>
 </template>
 
 <script>
 export default {
   data() {
+    // 侧边栏展示的项目
+    const navItem = [
+      {
+        name:'添加管理员',
+        path:'/addAdmin'
+      },
+      {
+        name:'删除管理员',
+        path:'/deleteAdmin'
+      },
+      {
+        name:'更新管理员信息',
+        path:'/updataAdmin'
+      },
+      {
+        name:'查找管理员',
+        path:'/selectAdmin'
+      },
+      {
+        name:'添加宠物',
+        path:'/addPet'
+      },
+      {
+        name:'更新宠物数据',
+        path:'/updataPet'
+      },
+      {
+        name:'个人中心',
+        path:'/myInfo'
+      },
+    ] // 列表项
     return {
-      //   navItem: [], // 列表项
-      activeItem: 0, // 活动的项
+        navItem, // 列表项
+        activeItem: 0, // 活动的项
     };
   },
-  props: {
-      navItem: {
-        type: Object,
-        required: true,
-      },
-  },
   created() {
-    console.log(this.$props.navItem);
   },
   methods: {
-    itemClickHandle(index) {
+    itemClickHandle(item,index) {
       this.activeItem = index;
+      this.$emit("navChange",item)
     },
   },
 };
@@ -41,6 +67,7 @@ export default {
 .sideNavContainer {
     display: flex;
     width: 100%;
+    height: 100%;
     ul{
         width: 100%;
         .sideNavItem{

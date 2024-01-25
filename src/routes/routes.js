@@ -1,18 +1,9 @@
-// import Login from "../components/Login.vue"
 import test from "../components/test.vue"
-import HelloWorld from "../components/HelloWorld.vue"
-import index from '../components/index.vue'
-const routes = [
-    {
-        name: 'index',
+const routes = [{
+        name: 'login',
         path: '/',
-        component: index
+        component: () => import("../components/Login.vue")
     },
-    // {
-    //     name:'/',
-    //     path: '/login',
-    //     component: Login
-    // },
     {
         name: 'test',
         path: '/test',
@@ -21,12 +12,52 @@ const routes = [
     {
         name: 'HelloWorld',
         path: '/HelloWorld',
-        component: HelloWorld
+        component: ()=>import("../components/HelloWorld.vue")
     },
     {
         name: 'home',
         path: '/home',
-        component: import("../components/Home.vue")
+        component: () => import("../components/Home.vue")
+    },
+    {
+        name: 'app',
+        path: '/app',
+        component: () => import("../App.vue")
+    },
+    {
+        name: 'addAdmin',
+        path: '/addAdmin',
+        component: () => import("../components/AddAdmin.vue")
+    },
+    {
+        name: 'deleteAdmin',
+        path: '/deleteAdmin',
+        component: () => import("../components/DelateAdmin.vue")
+    },
+    {
+        name: 'updataAdmin',
+        path: '/updataAdmin',
+        component: () => import("../components/UpdataAdmin.vue")
+    },
+    {
+        name: 'selectAdmin',
+        path: '/selectAdmin',
+        component: () => import("../components/SelectAdmin.vue")
+    },
+    {
+        name: 'addPet',
+        path: '/addPet',
+        component: () => import("../components/AddPet.vue")
+    },
+    {
+        name: 'updataPet',
+        path: '/updataPet',
+        component: () => import("../components/updataPet.vue")
+    },
+    {
+        name: 'myInfo',
+        path: '/myInfo',
+        component: () => import("../components/MyInfo.vue")
     },
 ]
 const exports = {
