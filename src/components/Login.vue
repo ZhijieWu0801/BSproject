@@ -20,6 +20,9 @@ export default {
     let isLogin = inject("isLogin")
     function login() {
       const data = { uTel, uPwd}
+      // const data = { uTel:uTel.ref, uPwd:uPwd.ref}
+
+      console.log(data);
       fetch(`${baseUrl}/api/admin/login`, {
         method: "POST",
         headers: {
@@ -29,14 +32,15 @@ export default {
       }).then((r) => {
         return r.json()
       }).then((r)=>{
+        console.log(r);
         if(!r.status){
           isLogin = true
           store.commit("setIsLogin",isLogin)
           console.log(store.getters.getIsLogin,1111);
           localStorage.setItem("islogin",true)
           router.push("/home")
+          // window.cTel = r
         }
-        console.log(r);
 
       });
     }

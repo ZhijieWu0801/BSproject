@@ -63,10 +63,15 @@ app.all('/api/admin/login', async (req, res) => {
                 data = {}
             return
         }
-        data = ins
+        data = ins;
         status = 0;
         message = "登陆成功"
-    } catch {} finally {
+    } catch (err){
+        console.log(err);
+        data='',
+        status = -1;
+        message = '登陆失败'
+    } finally {
         res.send({
             status,
             message,

@@ -9,7 +9,7 @@ const store = createStore({
     };
   },
   mutations: {
-    setIsLogin(state,value:boolean){
+    setIsLogin(state,value){
         state.isLogin = value
     }
   },
