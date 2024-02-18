@@ -16,15 +16,19 @@ exports.getRank = async (uTel) => {
     return uRank
 }
 // 判断电话是否被注册 返回 true / false
-exports.getTel = async (uTel) => {
+exports.findOneByUTel = async (uTel)=>{
     const ins = await Admin.findOne({
         where: {
             uTel
         }
     })
     const hasTel = ins ? ins.toJSON().uTel : null
-    console.log(!!hasTel);
     return hasTel
+}
+exports.getTel = async (uTel) => {
+const findOne = await this.findOneByUTel(uTel)
+    console.log(!!findOne);
+    return findOne
 }
 exports.addAdmin = async (obj) => {
     // console.log(this.getRank(obj.uTel));
@@ -35,14 +39,16 @@ exports.addAdmin = async (obj) => {
     })
     console.log(isFind);
     if (!isFind) {
-        return "管理员用户未找到"
+        // return "管理员用户未找到"
+       return new Error("管理员用户未找到")
     }
     if (await this.getRank(obj.cTel) != "0001") {
-        return "权限不足"
+       return new Error("权限不足")
     }
     const getTel = await this.getTel(obj.uTel);
     if (!!getTel) {
-        return "手机号已被注册"
+        // return "手机号已被注册"
+       return new Error("手机号已被注册")
     }
     obj.uPwd = md5(obj.uPwd)
     const ins = await Admin.create(obj)

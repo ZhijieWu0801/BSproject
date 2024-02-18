@@ -8,7 +8,8 @@ const {
     deleteAdmin,
     login,
     signIn,
-    updateOur
+    updateOur,
+    findOneByUTel
 } = require("../services/adminServes.cjs")
 app.all('/api/admin/addAdmin', async (req, res) => {
     console.log('参数', req.query);
@@ -36,7 +37,8 @@ app.all('/api/admin/addAdmin', async (req, res) => {
                 data: {}
             })
         }
-    } catch {
+    } catch(err) {
+        console.log(err);
         res.send({
             status: 0,
             message: "参数错误",
@@ -224,6 +226,20 @@ app.all('/api/admin/addPet', async (req, res) => {
 const FunctionList = require("../models/functionList.cjs")
 app.all("/api/function/getfunctionList", async (req, res) => {
     const ins = await FunctionList.findAll()
+    res.json({
+        data: ins
+    })
+    res.end()
+})
+app.all("/api/findOneByUTel", async (req, res) => {
+    console.log(req.query,6666);
+    // res.json({
+    //     data: req.query
+    // })
+    // res.end()
+
+    // return 
+    const ins = await findOneByUTel(res.query)
     res.json({
         data: ins
     })
