@@ -12,6 +12,7 @@
   },
   "dependencies": {
     "@tensorflow/tfjs": "^4.17.0",
+    "axios": "^1.6.7",
     "body-parser": "^1.20.2",
     "cors": "^2.8.5",
     "element-plus": "^2.5.1",
