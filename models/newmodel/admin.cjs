@@ -1,7 +1,7 @@
-// 管理员模型
+// 管理员模型(?表)
 // 自动配置主键
 // 用于登录等
-const sequelize = require("./db.cjs")
+const sequelize = require("./dbLink.cjs")
 const {
     DataTypes
 } = require("sequelize")
