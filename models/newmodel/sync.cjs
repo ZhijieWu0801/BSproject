@@ -1,12 +1,9 @@
 // 同步所有模型
-// require("./admin.cjs")
-// require("./PetBasInfo.cjs")
-// require("./NowMuster.cjs")
-// require("./functionList.cjs")
-
 const Pet = require("./Pet.cjs")
-const NowMuster = require("./NowMuster.cjs")
-NowMuster.hasMany(PetBasInfo)
+const Admin = require("./admin.cjs")
+const PetMaster = require("./PetMaster.cjs")
+// const NowMuster = require("./NowMuster.cjs")
+PetMaster.hasMany(Pet)//建立外键
 
 
 const sequelize = require('./dbLink.cjs')

@@ -1,12 +1,10 @@
 // 宠物模型
 // 自动配置主键
-
-const { square } = require("@tensorflow/tfjs")
 const sequelize = require("./db.cjs")
 const {
     DataTypes
 } = require("sequelize")
-const Pet = square.define(
+const Pet = sequelize.define(
     'Pet',{
         pName:{
             type: DataTypes.STRING,

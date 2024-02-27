@@ -1,5 +1,5 @@
 const pet = require("./Pet.cjs")
-const PetMuster = require("./PetMuster.cjs")
+const PetMuster = require("./PetMaster.cjs")
 
 
 PetMuster.hasMany(pet)
