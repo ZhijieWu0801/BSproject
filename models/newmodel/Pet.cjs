@@ -5,28 +5,28 @@ const {
     DataTypes
 } = require("sequelize")
 const Pet = sequelize.define(
-    'Pet',{
-        pName:{
+    'Pet', {
+        PName: {
             type: DataTypes.STRING,
-            allowNull:true,
-            comment:`宠物名字`,
+            allowNull: true,
+            comment: `宠物名字`,
         },
-        species:{
+        species: {
             type: DataTypes.STRING,
-            allowNull:false,
-            comment:`宠物种类`,
+            allowNull: false,
+            comment: `宠物种类`,
         },
-        serial:{
+        serial: {
             type: DataTypes.STRING,
-            allowNull:false,
-            comment:`宠物编号`,
+            allowNull: false,
+            comment: `宠物编号`,
         },
-        PetMaster:{
+        PetMaster: {
             type: DataTypes.STRING,
-            allowNull:true,
-            comment:`宠物主人`,
+            allowNull: true,
+            comment: `宠物主人`,
         },
-    },{
+    }, {
         tableName: "pet",
         createdAt: true, // 创建时间
         updatedAt: true, // 更新时间

@@ -4,6 +4,7 @@ const {
 //有关操作petbasinfo表的操作
 const Pet = require('../newmodel/Pet.cjs')
 const Admin = require('../newmodel/admin.cjs')
+const PetMaster = require('../newmodel/petMaster.cjs')
 const md5 = require("md5")
 const operable = {
     '0001': '超管',
@@ -46,6 +47,7 @@ module.exports = {
     Op,
     Pet,
     Admin,
+    PetMaster,
     md5,
     operable,
     app
