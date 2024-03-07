@@ -1,4 +1,32 @@
 const Models = require("./servicesComon.cjs")
+
+
+/**
+ * 第一个参数是目标对象
+ * 第二个参数是需要映射的对象
+ * 如果有 pwd 字段则会用 md5 加密
+ * @param {Object} mapObj 映射成为的目标
+ * @param {Object} obj 需要映射的对象
+ * @returns 映射完成的结果
+ */
+exports.isMap = (mapObj, obj) => {
+    let data = {}
+    for (item in obj) {
+        const key = mapObj[item]
+        if (item === 'pwd') {
+            data[key] = Models.md5(obj[item])
+        }
+        else if(item === 'birth'){
+            data[key] = new Date((obj[item])).getTime();
+
+        } else {
+            data[key] = obj[item]
+        }
+    }
+    return data
+}
+
+
 /**
  * 创建管理员
  * @param {Object} obj {ATel,APwd,AName,Limit,[Tissue,AAddress,Abirth]}
@@ -22,10 +50,11 @@ exports.createAdmin = async (obj) => {
 
 /**
  * 通过电话获取个人信息
+ * 第二个参数代表返回的时实例还是json转换后的对象，默认返回json对象，传入true返回实例
  * @param {String} Tel 
  * @returns 查询结果
  */
-exports.getInfoByTel = async (Tel) => {
+exports.getInfoByTel = async (Tel,not = false) => {
     const ins =
         (await Models.Admin.findOne({
             where: {
@@ -37,7 +66,9 @@ exports.getInfoByTel = async (Tel) => {
                 MTel: Tel
             }
         }))
-
+        if (not) {
+            return ins
+        }
     // console.log(ins?.toJSON());
     return ins && ins.toJSON()
 }
@@ -93,3 +124,4 @@ exports.login = async (obj) => {
 exports.getIdByTel = async (tel) => {
     return (await this.getInfoByTel(tel))?.id
 }
+

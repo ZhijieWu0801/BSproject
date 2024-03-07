@@ -1,5 +1,11 @@
 const Models = require("../servicesComon.cjs")
 const commonServeFunc = require("../commonServeFunc.cjs")
+const FileMap = {
+    name: "PName",
+    master: "PetMaster",
+    species: "species",
+    serial: "serial",
+}
 /**
  * 通过主人的电话查询名下的所有宠物
  * @param {String} tel 
@@ -32,9 +38,8 @@ exports.getPetByMasterTel = async (tel) => {
  * @returns 创建结果
  */
 exports.addPet = async (obj) => {
-    obj.PName = obj.name;
-    obj.PetMaster = obj.master;
-    const ins = await Models.Pet.create(obj)
+    const data = commonServeFunc.isMap(FileMap, obj)
+    const ins = await Models.Pet.create(data)
     return ins && ins.toJSON()
 }
 
@@ -73,36 +78,57 @@ exports.deletPet = async (arr) => {
 }
 /**
  * 编辑/更新 宠物信息
- * @param {Object} obj {serial,[species,PName,PetMasterTel]} 
+ * @param {Object} obj {serial,[species,PName,PetMasterTel,AdminTel]} 
  * @returns 
  */
 exports.updatePet = async (obj) => {
-    const isActive = !!await this.getPetBySerial(obj.serial)
-    if (!isActive) {
+    const Pet = await this.getPetBySerial(obj.serial, true)
+    if (!Pet) {
         return "宠物编号有误，未查询到宠物"
     }
-    if(obj.PetMasterTel){
-       const id = await commonServeFunc.getIdByTel(obj.PetMasterTel)
-    }
-    const ins = await Models.Pet.update(obj, {
-        where: {
-            serial: obj.serial
+    let ins
+    if (obj.PetMasterTel) {
+        const master = await commonServeFunc.getInfoByTel(obj.PetMasterTel, true)
+        if (!(master && master.toJSON && master.toJSON())) {
+            return "未找到用户"
         }
-
-    })
+        await Pet.setPetMaster(master.id);
+        ins = await Models.Pet.update(obj, {
+            where: {
+                serial: obj.serial
+            },
+        })
+    }
+    if (obj.AdminTel) {
+        const admin = await commonServeFunc.getInfoByTel(obj.AdminTel, true)
+        if (!(admin && admin.toJSON && admin.toJSON())) {
+            return "未找到管理员"
+        }
+        await Pet.setAdmin(admin.id);
+        ins = await Models.Pet.update(obj, {
+            where: {
+                serial: obj.serial
+            },
+        })
+    }
+    console.log(ins);
     return ins
 }
 
 /**
  * 通过编号获取宠物信息
+ * 第二个参数代表返回的时实例还是json转换后的对象，默认返回json对象，传入true返回实例
  * @param {String} serial 
  * @returns 宠物信息
  */
-exports.getPetBySerial = async (serial) => {
+exports.getPetBySerial = async (serial, not = false) => {
     const ins = await Models.Pet.findOne({
         where: {
             serial
         }
     })
+    if (not) {
+        return ins
+    }
     return ins && ins.toJSON()
 }

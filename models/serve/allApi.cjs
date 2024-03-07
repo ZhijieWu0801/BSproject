@@ -1,10 +1,12 @@
 const {
     app
 } = require('./servicesComon.cjs')
-const conmmonServe = require("./commonServeFunc.cjs")
+const commonServe = require("./commonServeFunc.cjs")
 const adminServe = require("./adminServe/adminServe.cjs")
 const masterServe = require("./masterServe/masterServe.cjs")
 const petServe = require("./petServe/petServe.cjs")
+
+
 app.all("/api/admin/createAdmin", async (req, res) => {
     const ins = await adminServe.createAdmin(req.query)
     console.log(req.query);
@@ -14,15 +16,74 @@ app.all("/api/admin/createAdmin", async (req, res) => {
     })
 })
 
+app.all("/api/admin/deleteAdminByTel", async (req, res) => {
+    const ins = await adminServe.deleteAdminByTel(req.query.tel)
+    res.send({
+        msg: ins,
+        query: req.query
+    })
+
+})
+
+app.all("/api/admin/updataAdmin", async (req, res) => {
+    const ins = await adminServe.updataAdmin(req.query)
+    res.send({
+        msg: ins,
+        query: req.query
+    })
+})
+
+app.all("/api/admin/updataAdminTel", async (req, res) => {
+    const ins = await adminServe.updataAdminTel(req.query)
+    res.send({
+        msg: ins,
+        query: req.query
+    })
+})
+
+app.all("/api/admin/getAdminByTel", async (req, res) => {
+    const ins = await commonServe.getAdminByTel(req.query.tel)
+    res.send({
+        msg: ins,
+        query: req.query
+    })
+})
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 app.all("/api/login", async (req, res) => {
-    const ins = await conmmonServe.login(req.query)
+    const ins = await commonServe.login(req.query)
     console.log(req.query);
     res.send({
         msg: ins,
         query: req.query
     })
 })
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 app.all("/api/master/signIn", async (req, res) => {
@@ -34,6 +95,48 @@ app.all("/api/master/signIn", async (req, res) => {
     })
 })
 
+app.all("/api/master/updateMaster", async (req, res) => {
+    let ins = await masterServe.updateMaster(req.query)
+    console.log(ins, req.query);
+    res.send({
+        data: '',
+        msg: ins,
+        query: req.query
+    })
+})
+
+app.all("/api/master/deleteMaster", async (req, res) => {
+    console.log(req.query);
+    let ins = await masterServe.deleteMaster(req.query)
+    console.log(ins, req.query);
+    res.send({
+        data: '',
+        msg: ins,
+        query: req.query
+    })
+})
+
+app.all("/api/master/upDataMasterTel", async (req, res) => {
+    let ins = await masterServe.upDataMasterTel(req.query)
+    console.log(ins, req.query);
+    res.send({
+        data: '',
+        msg: ins,
+        query: req.query
+    })
+})
+
+
+
+
+
+
+
+
+
+
+
+
 
 app.all("/api/pet/addPet", async (req, res) => {
     const ins = await petServe.addPet(req.query)
@@ -44,7 +147,8 @@ app.all("/api/pet/addPet", async (req, res) => {
     })
 })
 
-app.all("/api/getPetByMasterTel", async (req, res) => {
+app.all("/api/pet/getPetByMasterTel", async (req, res) => {
+    console.log(1111);
     const ins = await petServe.getPetByMasterTel(req.query.tel)
     const typeofIns = typeof ins
     console.log(req.query.tel, typeofIns);
