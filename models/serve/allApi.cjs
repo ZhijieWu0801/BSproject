@@ -139,6 +139,7 @@ app.all("/api/master/upDataMasterTel", async (req, res) => {
 
 
 app.all("/api/pet/addPet", async (req, res) => {
+    // const masterActive = 
     const ins = await petServe.addPet(req.query)
     console.log(req.query);
     res.send({
@@ -186,4 +187,28 @@ app.all("/api/pet/updatePet", async (req, res) => {
         msg: ins,
         query: req.query
     })
+})
+
+
+// const aaa = require("../../testPY.cjs")
+const axios = require('axios');
+app.all("/api/serve/PY", async (req, res) => {
+    const postData = {
+        key1: 'value1',
+        key2: 'value2',
+    };
+const url = 'http://127.0.0.1:5000/api/hello'
+    axios.post(url, postData)
+        .then(response => {
+            console.log('Response:', response.data);
+            res.send({
+                msg:response.data
+            })
+        })
+        .catch(error => {
+            console.error('Error:', error.message);
+            res.send({
+                msg:error.message
+            })
+        });
 })
