@@ -20,6 +20,7 @@ const Pet = sequelize.define(
       type: DataTypes.STRING,
       allowNull: false,
       comment: `宠物编号`,
+      unique: true,
     },
     PetMasterId: {
       type: DataTypes.INTEGER, // Assuming the id in PetMaster is an integer

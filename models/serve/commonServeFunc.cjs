@@ -1,6 +1,13 @@
 const Models = require("./servicesComon.cjs")
 
-
+const petType2Text = {
+    M: "猫",
+    D: "狗"
+}
+const petText2Type = {
+    "猫": "M",
+    "狗": "D"
+}
 /**
  * 第一个参数是目标对象
  * 第二个参数是需要映射的对象
@@ -15,8 +22,7 @@ exports.isMap = (mapObj, obj) => {
         const key = mapObj[item]
         if (item === 'pwd') {
             data[key] = Models.md5(obj[item])
-        }
-        else if(item === 'birth'){
+        } else if (item === 'birth') {
             data[key] = new Date((obj[item])).getTime();
 
         } else {
@@ -54,7 +60,7 @@ exports.createAdmin = async (obj) => {
  * @param {String} Tel 
  * @returns 查询结果
  */
-exports.getInfoByTel = async (Tel,not = false) => {
+exports.getInfoByTel = async (Tel, not = false) => {
     const ins =
         (await Models.Admin.findOne({
             where: {
@@ -66,9 +72,9 @@ exports.getInfoByTel = async (Tel,not = false) => {
                 MTel: Tel
             }
         }))
-        if (not) {
-            return ins
-        }
+    if (not) {
+        return ins
+    }
     // console.log(ins?.toJSON());
     return ins && ins.toJSON()
 }
@@ -76,14 +82,18 @@ exports.getInfoByTel = async (Tel,not = false) => {
 /**
  * 通过电话获取管理员信息 
  * @param {String} ATel 
+ * @param {String} useOriginal 返回查询到的实例 或者 解析后的JSON 
  * @returns 查询结果
  */
-exports.getAdminByTel = async (ATel) => {
+exports.getAdminByTel = async (ATel, useOriginal = false) => {
     const ins = await Models.Admin.findOne({
         where: {
             ATel
         }
     })
+    if (useOriginal) {
+        return ins
+    }
     // console.log(ins?.toJSON());
     return ins && ins.toJSON()
 }
@@ -95,9 +105,13 @@ exports.getAdminByTel = async (ATel) => {
  * @returns 返回能不能成功登录
  */
 exports.login = async (obj) => {
+    console.log(obj);
     if (!await this.getInfoByTel(obj.tel)) {
         console.log("未找到用户");
-        return "未找到用户"
+        return {
+            msg: "未找到用户",
+            state: 404
+        }
     }
     obj.pwd = Models.md5(obj.pwd)
     const ins = await Models.Admin.findOne({
@@ -112,8 +126,15 @@ exports.login = async (obj) => {
                 MPwd: obj.pwd
             }
         })
-    console.log(ins?.toJSON());
-    return ins ? "登陆成功" : "密码错误"
+    console.log(ins?.toJSON(),111111);
+    return ins ? {
+        data:ins,
+        msg: "登陆成功",
+        state: 200
+    } : {
+        msg: "密码错误",
+        state: 401
+    }
 }
 
 /**
@@ -125,3 +146,26 @@ exports.getIdByTel = async (tel) => {
     return (await this.getInfoByTel(tel))?.id
 }
 
+const sequelize = require('sequelize');
+
+// 查询表中不同字母的种类数量
+exports.uniqueLettersCount = async () => {
+
+    const ins = await Models.Pet.findAll({
+            attributes: [
+                [sequelize.fn('DISTINCT', sequelize.fn('SUBSTRING_INDEX', sequelize.col('serial'), '-', 1)), 'first_letter']
+            ]
+        })
+        .then(results => {
+            const uniqueLettersCount = results.map(i => {
+                return petType2Text[i.getDataValue("first_letter")]
+            });
+            console.log('不同字母的种类数量：', uniqueLettersCount);
+            return uniqueLettersCount
+        })
+        .catch(error => {
+            console.error('查询数据时出错：', error);
+            return error
+        });
+    return ins
+}

@@ -43,6 +43,11 @@ const Admin = sequelize.define(
             allowNull: true,
             comment: `管理员生日`,
         },
+        deleteMsg:{
+            type: DataTypes.STRING,
+            allowNull: true,
+            comment: `删除原因`,
+        }
     }, {
         tableName: "Admin",
         createdAt: true, // 创建时间

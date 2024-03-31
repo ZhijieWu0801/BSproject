@@ -9,7 +9,7 @@ const petServe = require("./petServe/petServe.cjs")
 
 app.all("/api/admin/createAdmin", async (req, res) => {
     const ins = await adminServe.createAdmin(req.query)
-    console.log(req.query);
+    // console.log(req.query);
     res.send({
         msg: ins,
         query: req.query
@@ -17,7 +17,8 @@ app.all("/api/admin/createAdmin", async (req, res) => {
 })
 
 app.all("/api/admin/deleteAdminByTel", async (req, res) => {
-    const ins = await adminServe.deleteAdminByTel(req.query.tel)
+    console.log(req.query);
+    const ins = await adminServe.deleteAdminByTel(req.query)
     res.send({
         msg: ins,
         query: req.query
@@ -42,9 +43,24 @@ app.all("/api/admin/updataAdminTel", async (req, res) => {
 })
 
 app.all("/api/admin/getAdminByTel", async (req, res) => {
+    console.log(req.query);
     const ins = await commonServe.getAdminByTel(req.query.tel)
     res.send({
-        msg: ins,
+        data: ins,
+        query: req.query
+    })
+})
+app.all("/api/admin/getAllAdmin", async (req, res) => {
+    const ins = await adminServe.findAll()
+    res.send({
+        data: ins,
+        query: req.query
+    })
+})
+app.all("/api/pet/uniqueLettersCount", async (req, res) => {
+    const ins = await commonServe.uniqueLettersCount()
+    res.send({
+        data: ins,
         query: req.query
     })
 })
@@ -68,7 +84,7 @@ app.all("/api/login", async (req, res) => {
     const ins = await commonServe.login(req.query)
     console.log(req.query);
     res.send({
-        msg: ins,
+        ...ins,
         query: req.query
     })
 })
@@ -151,6 +167,19 @@ app.all("/api/pet/addPet", async (req, res) => {
 app.all("/api/pet/getPetByMasterTel", async (req, res) => {
     console.log(1111);
     const ins = await petServe.getPetByMasterTel(req.query.tel)
+    const typeofIns = typeof ins
+    console.log(req.query.tel, typeofIns);
+    res.send({
+        data: ins,
+        msg: typeofIns !== "string" ? (typeofIns === "object" && ins.length ? "查询成功" : "用户无宠物") : ins,
+        query: req.query
+    })
+})
+
+
+app.all("/api/pet/getAllPetByType", async (req, res) => {
+    console.log(1111);
+    const ins = await petServe.getAllPetByType(req.query.species,true)
     const typeofIns = typeof ins
     console.log(req.query.tel, typeofIns);
     res.send({

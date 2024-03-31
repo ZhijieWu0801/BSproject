@@ -132,3 +132,19 @@ exports.getPetBySerial = async (serial, not = false) => {
     }
     return ins && ins.toJSON()
 }
+
+
+
+exports.getAllPetByType = async (species, not = false) => {
+    const ins = await Models.Pet.findAll({
+        where: {
+            species
+        },
+        include: 
+        { model: Models.PetMaster, as: 'petMaster' }
+    })
+    if (not) {
+        return ins
+    }
+    return ins && ins.toJSON()
+}

@@ -15,6 +15,7 @@ const app = express()
 
 // cors中间件，处理跨域，允许所有源，所有请求类型
 const cors = require("cors")
+console.log("处理跨域");
 app.use(cors())
 app.options('*', cors())
 

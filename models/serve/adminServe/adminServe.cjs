@@ -16,8 +16,9 @@ const FileMap = {
  */
 exports.createAdmin = async (obj) => {
     const data = commonServeFunc.isMap(FileMap, obj)
+    // 手机号码是否存在
     const isExist = await commonServeFunc.getInfoByTel(data.ATel)
-    console.log(isExist);
+    // console.log(isExist,"-----------------------------------------");
     if (!!isExist) {
         return {
             "mes": "手机号已被占用"
@@ -36,18 +37,25 @@ exports.createAdmin = async (obj) => {
  * @returns 
  */
 exports.deleteAdminByTel = async (obj) => {
-    console.log(obj);
+    // console.log(obj);
     const ATel = obj.tel
-    const isActive = await commonServeFunc.getAdminByTel(ATel)
+    // 第二个参数代表需要的是查询到的源数据
+    const isActive = await commonServeFunc.getAdminByTel(ATel,true)
+    console.log(isActive,45654);
     if (!isActive) {
         return "未查询到管理员"
+    }
+    // 有删除的额外消息则设置，没有就不设置
+    if(obj.msg){
+        isActive.deleteMsg = obj.msg
+        isActive.save()
     }
     const ins = await Models.Admin.destroy({
         where: {
             ATel
         }
     })
-    console.log("ins:::", ins);
+    // console.log("ins:::", ins);
     return ins
 }
 
@@ -63,12 +71,13 @@ exports.updataAdmin = async (obj) => {
         return "未找到管理员"
     }
     console.log(data, 123);
-    const ins = Models.Admin.update(data, {
+    const ins = await Models.Admin.update(data, {
         where: {
             ATel: data.ATel,
-            APwd: data.APwd
+            APwd: Models.md5(data.APwd)
         }
     })
+    console.log(ins);
     if (ins[0] === 0) {
         return "密码错误"
     }
@@ -103,4 +112,12 @@ exports.getLimitByTel = async (ATel) => {
     const ins = await commonServeFunc.getAdminByTel(ATel)
     console.log(ins);
     return ins ? (ins.Limit ? ins.Limit : "未设置管理员权限") : "未查询到管理员"
+}
+exports.findAll = async (ATel) => {
+    const ins = await Models.Admin.findAll()
+    console.log(ins);
+    const aaa = ins.map(r=>{
+        return r.toJSON()
+    })
+    return aaa 
 }
