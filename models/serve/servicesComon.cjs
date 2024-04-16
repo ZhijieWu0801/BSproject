@@ -22,6 +22,11 @@ app.options('*', cors())
 
 //解析body传递的参数
 const bodyParser = require('body-parser');
+// 设置请求体大小限制为 10MB
+app.use(bodyParser.json({ limit: '20mb' }));
+app.use(bodyParser.urlencoded({ limit: '20mb', extended: true }));
+
+
 // 解析 application/x-www-form-urlencoded 格式的参数
 app.use(bodyParser.urlencoded({
     extended: false

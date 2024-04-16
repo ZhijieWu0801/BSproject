@@ -1,13 +1,22 @@
 const Models = require("./servicesComon.cjs")
+const {
+    petType2Text,
+    petText2Type
+} = require("../serve/common/const.cjs")
+const {
+    v4: uuidv4
+} = require('uuid');
+// const uuid = uuidv4();
+// console.log(uuid);
 
-const petType2Text = {
-    M: "猫",
-    D: "狗"
-}
-const petText2Type = {
-    "猫": "M",
-    "狗": "D"
-}
+// const petType2Text = {
+//     M: "猫",
+//     D: "狗"
+// }
+// const petText2Type = {
+//     "猫": "M",
+//     "狗": "D"
+// }
 /**
  * 第一个参数是目标对象
  * 第二个参数是需要映射的对象
@@ -47,6 +56,7 @@ exports.createAdmin = async (obj) => {
         }
     }
     obj.APwd = Models.md5(obj.APwd)
+    obj.loginToken = this.getToken()
     Models.Admin.create(obj)
     return {
         "mes": "成功添加"
@@ -110,6 +120,7 @@ exports.login = async (obj) => {
         console.log("未找到用户");
         return {
             msg: "未找到用户",
+            isSuccessful: false,
             state: 404
         }
     }
@@ -126,13 +137,16 @@ exports.login = async (obj) => {
                 MPwd: obj.pwd
             }
         })
-    console.log(ins?.toJSON(),111111);
+    console.log(ins?.toJSON(), 111111);
     return ins ? {
-        data:ins,
+        data: ins,
         msg: "登陆成功",
+        isSuccessful: true,
         state: 200
     } : {
+        data: {},
         msg: "密码错误",
+        isSuccessful: false,
         state: 401
     }
 }
@@ -169,3 +183,28 @@ exports.uniqueLettersCount = async () => {
         });
     return ins
 }
+
+// 获取一个随机的数
+/**
+ * 
+ * @returns 数据格式 YYYYMMDDHHMMSSXXXX
+ */
+exports.getRandomNum = () => {
+    const randomNum = `${String((new Date()).getUTCFullYear()).padStart(2,"0") }${String((new Date()).getUTCMonth()+1).padStart(2,"0") }${String((new Date()).getUTCDay()).padStart(2,"0") }${String((new Date()).getUTCHours()).padStart(2,"0") }${String((new Date()).getUTCMinutes()).padStart(2,"0") }${String((new Date()).getUTCSeconds()).padStart(2,"0") }${String(Math.floor(Math.random()*10000)).padStart(4,"0") }`
+    console.log(randomNum);
+    return randomNum
+}
+
+/**
+ * 获取一个随机的token
+ * @return token
+ */
+
+exports.getToken = () => {
+    // const RandomNum = `${(~~(Math.random() * Math.pow(10,10))).toString(36)}${(~~(Math.random() * Math.pow(10,10))).toString(36)}`
+    const uuid = uuidv4()
+    console.log(uuid);
+    return uuid
+}
+
+// this.getToken()

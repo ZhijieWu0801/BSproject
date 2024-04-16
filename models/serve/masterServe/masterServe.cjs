@@ -16,11 +16,12 @@ const FileMap = {
  */
 
 exports.signIn = async (obj) => {
-    if (await commonServeFunc.getInfoByTel(obj)) {
+    if (await commonServeFunc.getInfoByTel(obj.tel)) {
         return "电话已被占用"
     }
     let data = {}
     data = commonServeFunc.isMap(FileMap, obj)
+    data.loginToken = commonServeFunc.getToken()
     // console.log("data:::",data);
     const ins = await Models.PetMaster.create(data)
     console.log(ins.toJSON());

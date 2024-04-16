@@ -82,6 +82,7 @@ app.all("/api/pet/uniqueLettersCount", async (req, res) => {
 
 app.all("/api/login", async (req, res) => {
     const ins = await commonServe.login(req.query)
+    // console.log("---",commonServe.getToken());
     console.log(req.query);
     res.send({
         ...ins,
@@ -107,6 +108,9 @@ app.all("/api/master/signIn", async (req, res) => {
     console.log(req.query);
     res.send({
         msg: ins,
+        data:{
+            isSuccessful: ins === "注册成功"
+        },
         query: req.query
     })
 })
@@ -179,7 +183,7 @@ app.all("/api/pet/getPetByMasterTel", async (req, res) => {
 
 app.all("/api/pet/getAllPetByType", async (req, res) => {
     console.log(1111);
-    const ins = await petServe.getAllPetByType(req.query.species,true)
+    const ins = await petServe.getAllPetByType(req.query.species, true)
     const typeofIns = typeof ins
     console.log(req.query.tel, typeofIns);
     res.send({
@@ -219,25 +223,23 @@ app.all("/api/pet/updatePet", async (req, res) => {
 })
 
 
-// const aaa = require("../../testPY.cjs")
 const axios = require('axios');
 app.all("/api/serve/PY", async (req, res) => {
     const postData = {
-        key1: 'value1',
-        key2: 'value2',
+        image: req.query.image,
     };
-const url = 'http://127.0.0.1:5000/api/hello'
+    const url = 'http://127.0.0.1:5000/api/hello'
     axios.post(url, postData)
         .then(response => {
             console.log('Response:', response.data);
             res.send({
-                msg:response.data
+                msg: response.data
             })
         })
         .catch(error => {
             console.error('Error:', error.message);
             res.send({
-                msg:error.message
+                msg: error.message
             })
         });
 })

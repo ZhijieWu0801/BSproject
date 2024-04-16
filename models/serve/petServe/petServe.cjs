@@ -6,6 +6,7 @@ const FileMap = {
     species: "species",
     serial: "serial",
 }
+const {petText2Type} = require("../common/const.cjs")
 /**
  * 通过主人的电话查询名下的所有宠物
  * @param {String} tel 
@@ -38,7 +39,9 @@ exports.getPetByMasterTel = async (tel) => {
  * @returns 创建结果
  */
 exports.addPet = async (obj) => {
+    console.log(petText2Type[obj.species],obj);
     const data = commonServeFunc.isMap(FileMap, obj)
+    data.serial=`${petText2Type[obj.species]}-${commonServeFunc.getRandomNum()}`
     const ins = await Models.Pet.create(data)
     return ins && ins.toJSON()
 }

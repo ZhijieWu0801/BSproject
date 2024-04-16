@@ -26,6 +26,11 @@ const PetMaster = sequelize.define(
             allowNull: false,
             comment: `宠主密码`,
         },
+        loginToken:{
+            type: DataTypes.STRING,
+            allowNull: false,
+            comment: `登录令牌`,
+        },
     }, {
         tableName: "PetMaster",
         createdAt: true, // 创建时间

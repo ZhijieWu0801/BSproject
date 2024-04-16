@@ -47,7 +47,12 @@ const Admin = sequelize.define(
             type: DataTypes.STRING,
             allowNull: true,
             comment: `删除原因`,
-        }
+        },
+        loginToken:{
+            type: DataTypes.STRING,
+            allowNull: false,
+            comment: `登录令牌`,
+        },
     }, {
         tableName: "Admin",
         createdAt: true, // 创建时间
