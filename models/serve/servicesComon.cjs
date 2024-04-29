@@ -3,8 +3,8 @@ const {
 } = require("sequelize");
 //有关操作petbasinfo表的操作
 const Pet = require('../newmodel/Pet.cjs')
-const Admin = require('../newmodel/admin.cjs')
-const PetMaster = require('../newmodel/petMaster.cjs')
+const Admin = require('../newmodel/Admin.cjs')
+const PetMaster = require('../newmodel/PetMaster.cjs')
 const md5 = require("md5")
 const operable = {
     '0001': '超管',
@@ -44,7 +44,11 @@ const handleParams = (req, res, next) => {
     next()
 }
 app.use(handleParams);
-
+app.use((err, req, res, next) => {
+    console.error('An error occurred:', err);
+    res.status(500).json({ error: 'Internal Server Error' });
+    next()
+  });
 // 开启监听
 app.listen(3000, () => {
     console.log("监听3000");

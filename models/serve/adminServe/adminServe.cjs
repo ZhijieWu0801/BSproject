@@ -16,6 +16,7 @@ const FileMap = {
  */
 exports.createAdmin = async (obj) => {
     const data = commonServeFunc.isMap(FileMap, obj)
+    data.loginToken = commonServeFunc.getToken()
     // 手机号码是否存在
     const isExist = await commonServeFunc.getInfoByTel(data.ATel)
     // console.log(isExist,"-----------------------------------------");
@@ -40,13 +41,13 @@ exports.deleteAdminByTel = async (obj) => {
     // console.log(obj);
     const ATel = obj.tel
     // 第二个参数代表需要的是查询到的源数据
-    const isActive = await commonServeFunc.getAdminByTel(ATel,true)
-    console.log(isActive,45654);
+    const isActive = await commonServeFunc.getAdminByTel(ATel, true)
+    console.log(isActive, 45654);
     if (!isActive) {
         return "未查询到管理员"
     }
     // 有删除的额外消息则设置，没有就不设置
-    if(obj.msg){
+    if (obj.msg) {
         isActive.deleteMsg = obj.msg
         isActive.save()
     }
@@ -67,15 +68,19 @@ exports.deleteAdminByTel = async (obj) => {
 exports.updataAdmin = async (obj) => {
     const data = commonServeFunc.isMap(FileMap, obj)
     const isActive = await commonServeFunc.getAdminByTel(data.ATel)
-    if(!isActive){
+    if (!isActive) {
         return "未找到管理员"
     }
+    // 记得做超管改密码和自己改密码的区别
     console.log(data, 123);
+    const where = {
+        ATel: data.ATel,
+    }
+    if(!obj.isSupper){
+        where.Apwd = Models.md5(data.APwd)
+    }
     const ins = await Models.Admin.update(data, {
-        where: {
-            ATel: data.ATel,
-            APwd: Models.md5(data.APwd)
-        }
+        where
     })
     console.log(ins);
     if (ins[0] === 0) {
@@ -113,11 +118,31 @@ exports.getLimitByTel = async (ATel) => {
     console.log(ins);
     return ins ? (ins.Limit ? ins.Limit : "未设置管理员权限") : "未查询到管理员"
 }
-exports.findAll = async (ATel) => {
-    const ins = await Models.Admin.findAll()
-    console.log(ins);
-    const aaa = ins.map(r=>{
+/**
+ * 获取组织内所有管理员
+ * @param {*} obj {page,pageSize,tissue}
+ * @returns 
+ */
+exports.findAllAdmin = async (obj) => {
+    let queryOptions = {
+        limit: obj.pageSize ? +obj.pageSize : null,
+        offset: obj.pageSize && obj.page ? (+obj.page - 1) * +obj.pageSize : null,
+        where: {}
+      };
+    const tissue = obj.tissue ? obj.tissue : null;
+    tissue ? queryOptions.where.tissue = tissue : '';
+    const ins = await Models.Admin.findAll(queryOptions);
+    let opt; 
+     tissue ? opt.where.tissue = tissue : '';
+    const pageSizeIns = await Models.Admin.findAll(opt);
+    // console.log(pageSizeIns.length,66555);
+    // console.log(ins);
+    const list = ins.map(r => {
         return r.toJSON()
     })
-    return aaa 
+    console.log(list);
+    return {
+        list,
+        total: pageSizeIns? pageSizeIns.length : 0
+    }
 }

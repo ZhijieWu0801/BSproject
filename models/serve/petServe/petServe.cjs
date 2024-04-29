@@ -6,7 +6,11 @@ const FileMap = {
     species: "species",
     serial: "serial",
 }
-const {petText2Type} = require("../common/const.cjs")
+const {
+    petText2Type,
+    petText2Type2,
+    petType2Text
+} = require("../common/const.cjs")
 /**
  * 通过主人的电话查询名下的所有宠物
  * @param {String} tel 
@@ -39,9 +43,10 @@ exports.getPetByMasterTel = async (tel) => {
  * @returns 创建结果
  */
 exports.addPet = async (obj) => {
-    console.log(petText2Type[obj.species],obj);
+    // console.log(petText2Type[obj.species], obj);
     const data = commonServeFunc.isMap(FileMap, obj)
-    data.serial=`${petText2Type[obj.species]}-${commonServeFunc.getRandomNum()}`
+    data.serial = `${petText2Type[obj.species]}-${commonServeFunc.getRandomNum()}`
+    console.log(data, 666);
     const ins = await Models.Pet.create(data)
     return ins && ins.toJSON()
 }
@@ -137,17 +142,42 @@ exports.getPetBySerial = async (serial, not = false) => {
 }
 
 
-
-exports.getAllPetByType = async (species, not = false) => {
+/**
+ * 通过类型获得宠物列表
+ * @param {*} obj {species，[page,pageSize]}
+ * @param {*} not 是否返回原始数据，默认不返回
+ * @returns 
+ */
+exports.getAllPetByType = async (obj, not = false) => {
+    console.log(obj, petText2Type2[obj.species], 2222);
+    const totalIns = await Models.Pet.findAll({
+        where: {
+            species: petType2Text[petText2Type2[obj.species]],
+        }
+    })
+    // console.log(totalIns.length);
+    // const total = totalIns.length;
     const ins = await Models.Pet.findAll({
         where: {
-            species
+            species: petType2Text[petText2Type2[obj.species]],
         },
-        include: 
-        { model: Models.PetMaster, as: 'petMaster' }
+        limit: obj.pageSize ? +obj.pageSize : null,
+        offset: obj.pageSize && obj.page ? (+obj.page - 1) * +obj.pageSize : null,
+        include: {
+            model: Models.PetMaster,
+            as: 'petMaster'
+        }
     })
-    if (not) {
-        return ins
+    // ins.push({total:totalIns.length})
+    // console.log(ins,44444444444);
+    if (!ins) {
+        // console.log(ins,555555);
+        return "未查询到"
     }
-    return ins && ins.toJSON()
+    if (not) {
+        // console.log(ins,6666);
+        return {ins:ins,total:totalIns.length}
+    }
+    // console.log(ins,777);
+    return ins.toJSON()
 }

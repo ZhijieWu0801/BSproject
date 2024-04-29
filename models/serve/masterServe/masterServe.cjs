@@ -1,12 +1,12 @@
 const Models = require("../servicesComon.cjs")
 const commonServeFunc = require("../commonServeFunc.cjs")
-const FileMap = {
-    name: "MPName",
-    tel: "MTel",
-    address: "MAddress",
-    pwd: "MPwd"
-}
-
+// const MasterFileMap = {
+//     name: "MPName",
+//     tel: "MTel",
+//     address: "MAddress",
+//     pwd: "MPwd"
+// }
+const {MasterFileMap} = require("../common/const.cjs");
 
 /**
  * 宠主注册
@@ -20,7 +20,8 @@ exports.signIn = async (obj) => {
         return "电话已被占用"
     }
     let data = {}
-    data = commonServeFunc.isMap(FileMap, obj)
+    console.log(MasterFileMap);
+    data = commonServeFunc.isMap(MasterFileMap, obj)
     data.loginToken = commonServeFunc.getToken()
     // console.log("data:::",data);
     const ins = await Models.PetMaster.create(data)
@@ -39,7 +40,7 @@ exports.updateMaster = async (obj) => {
     //     MAddress: obj.address,
     //     MPwd: obj.pwd,
     // }
-    const data = commonServeFunc.isMap(FileMap, obj)
+    const data = commonServeFunc.isMap(MasterFileMap, obj)
     const ins = await Models.PetMaster.update(data, {
         where: {
             MTel: data.MTel,
@@ -58,7 +59,7 @@ exports.updateMaster = async (obj) => {
  * @returns 
  */
 exports.deleteMaster = async (obj) => {
-    const data = commonServeFunc.isMap(FileMap, obj)
+    const data = commonServeFunc.isMap(MasterFileMap, obj)
     console.log(data);
     const ins = await Models.PetMaster.destroy({
         where: {
@@ -88,4 +89,10 @@ exports.upDataMasterTel = async (obj) => {
         return "删除失败"
     }
     return ins
+}
+/**
+ * 通过地区获取该地区的注册过的用户
+ */
+exports.getAllMasterBydistrict=()=>{
+    // 暂定
 }

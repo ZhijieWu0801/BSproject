@@ -7,8 +7,9 @@
     "dev": "vite",
     "build": "vite build",
     "start": "nodemon -x npm run serve",
-    "serve": "node ./routers/init.cjs",
-    "preview": "vite preview"
+    "serve": "node models/serve/allApi.cjs",
+    "preview": "vite preview",
+    "nodemon": "nodemon"
   },
   "dependencies": {
     "@tensorflow/tfjs": "^4.17.0",
