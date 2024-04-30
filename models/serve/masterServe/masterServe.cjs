@@ -6,7 +6,9 @@ const commonServeFunc = require("../commonServeFunc.cjs")
 //     address: "MAddress",
 //     pwd: "MPwd"
 // }
-const {MasterFileMap} = require("../common/const.cjs");
+const {
+    MasterFileMap
+} = require("../common/const.cjs");
 
 /**
  * 宠主注册
@@ -93,6 +95,88 @@ exports.upDataMasterTel = async (obj) => {
 /**
  * 通过地区获取该地区的注册过的用户
  */
-exports.getAllMasterBydistrict=()=>{
+exports.getAllMasterBydistrict = () => {
     // 暂定
+}
+
+/**
+ * 收养(连接)一个宠物
+ * @param obj {tel,serial}
+ */
+exports.linkPet = async (obj) => {
+    const pet = await Models.Pet.findOne({
+        where: {
+            serial: obj.serial
+        }
+    })
+    if (!pet) {
+        return {
+            msg: `宠物编号错误，未找到宠物`,
+            code: 404,
+        }
+    }
+    const master = await Models.PetMaster.findOne({
+        where: {
+            MTel: obj.tel
+        }
+    })
+    if (!master) {
+        return {
+            mas: `用户未注册`,
+            code: 404,
+        }
+    }
+    const masterId = master.toJSON().id
+    pet.update({
+        PetMasterId: masterId
+    })
+    console.log(pet.toJSON(), "--------", master.toJSON());
+    return {
+        mas: `更新成功`,
+        code: 200,
+    }
+}
+/**
+ * 断开宠物和主人的绑定
+ * 宠物归还
+ * @param {*} obj { tel , serial} 
+ */
+exports.disconnectPetLink = async (obj)=>{
+    const pet = await Models.Pet.findOne({
+        where: {
+            serial: obj.serial
+        }
+    })
+    if (!pet) {
+        return {
+            msg: `宠物编号错误，未找到宠物`,
+            code: 404,
+        }
+    }
+    if (!pet.toJSON().PetMasterId) {
+        return {
+            msg: `该宠物没有关联的主人`,
+            code: 404,
+        }
+    }
+    const master = await Models.PetMaster.findOne({
+        where: {
+            MTel: obj.tel,
+        }
+    })
+    if (!master) {
+        return {
+            mas: `用户未注册`,
+            code: 404,
+        }
+    }
+    // const masterId = master.toJSON().id
+    pet.update({
+        PetMasterId: null,
+    })
+    console.log(pet.toJSON(), "--------", master.toJSON());
+    return {
+        mas: `更新成功`,
+        code: 200,
+    }
 }

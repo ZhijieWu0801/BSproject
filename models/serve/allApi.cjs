@@ -205,6 +205,42 @@ app.all("/api/master/upDataMasterTel", async (req, res) => {
 })
 
 
+app.all("/api/master/linkPet", async (req, res) => {
+    let ins;
+    try {
+        ins = await masterServe.linkPet(req.query)
+    } catch (error) {
+        ins = error;
+    }
+    console.log(ins, req.query);
+    res.send({
+        data: {
+            code: ins.code
+        },
+        msg: ins.msg,
+        query: req.query
+    })
+})
+
+
+app.all("/api/master/disconnectPetLink", async (req, res) => {
+    let ins;
+    try {
+        ins = await masterServe.disconnectPetLink(req.query)
+    } catch (error) {
+        ins = error;
+    }
+    console.log(ins, req.query);
+    res.send({
+        data: {
+            code: ins.code
+        },
+        msg: ins.msg,
+        query: req.query
+    })
+})
+
+
 
 
 

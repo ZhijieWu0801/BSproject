@@ -1,7 +1,7 @@
 // const func = require("./commonServeFunc.cjs")
 // const adminFun = require("./adminServe/adminServe.cjs")
 // const petFun = require("./petServe/petServe.cjs")
-// const masterFun = require("./masterServe/masterServe.cjs")
+const masterFun = require("./masterServe/masterServe.cjs")
 // console.log(func,func.func);
 // func.createAdmin({
 //     ATel:"12345678900",
@@ -32,8 +32,10 @@
 //     console.log(r);
 // })
 // func.getRandomNum()
-console.log(typeof new Date());
-console.log(new Date());
-aaa =
-    `${String((new Date()).getUTCFullYear()).padStart(2,"0") }${String((new Date()).getUTCMonth()+1).padStart(2,"0") }${String((new Date()).getUTCDay()).padStart(2,"0") }${String((new Date()).getUTCHours()).padStart(2,"0") }${String((new Date()).getUTCMinutes()).padStart(2,"0") }${String((new Date()).getUTCSeconds()).padStart(2,"0") }${Math.floor(Math.random()*10000) }`
-console.log(aaa);
+// console.log(typeof new Date());
+// console.log(new Date());
+// aaa =
+//     `${String((new Date()).getUTCFullYear()).padStart(2,"0") }${String((new Date()).getUTCMonth()+1).padStart(2,"0") }${String((new Date()).getUTCDay()).padStart(2,"0") }${String((new Date()).getUTCHours()).padStart(2,"0") }${String((new Date()).getUTCMinutes()).padStart(2,"0") }${String((new Date()).getUTCSeconds()).padStart(2,"0") }${Math.floor(Math.random()*10000) }`
+// console.log(aaa);
+// console.log(masterFun);
+masterFun.linkPet({serial:"M-202404010712472650",tel:"123456789001"})

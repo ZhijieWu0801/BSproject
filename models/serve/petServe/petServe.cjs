@@ -22,6 +22,7 @@ exports.getPetByMasterTel = async (tel) => {
         return "未找到用户"
     }
     const ins = await Models.Pet.findAll({
+        include: Models.PetMaster,
         where: {
             PetMasterId
         }
