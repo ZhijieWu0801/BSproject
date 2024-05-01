@@ -31,6 +31,11 @@ const Pet = sequelize.define(
         key: 'id',
       },
     },
+    PetImg:{
+      type: DataTypes.STRING,
+      allowNull: true,
+      comment: `宠物照片`,
+    }
   },
   {
     tableName: 'pet',
