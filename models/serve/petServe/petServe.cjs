@@ -37,6 +37,14 @@ exports.getPetByMasterTel = async (tel) => {
     return ins.length ? ins : "未找到用户的宠物"
 }
 
+exports.getPetBySerial = async (serial) => {
+    const ins = await Models.Pet.findOne({
+        where: {
+            serial: serial
+        }
+    })
+    return ins ? ins.toJSON() : null
+}
 
 /**
  * 添加一个宠物
@@ -60,7 +68,12 @@ exports.addPet = async (obj) => {
  * @returns 删除结果
  */
 exports.deletOnePet = async (serial) => {
-
+    const isActive = await this.getPetBySerial({
+        serial
+    })
+    if (!isActive) {
+        return "宠物编号有误"
+    }
     const ins = await Models.Pet.destroy({
         where: {
             serial: serial
@@ -177,7 +190,10 @@ exports.getAllPetByType = async (obj, not = false) => {
     }
     if (not) {
         // console.log(ins,6666);
-        return {ins:ins,total:totalIns.length}
+        return {
+            ins: ins,
+            total: totalIns.length
+        }
     }
     // console.log(ins,777);
     return ins.toJSON()

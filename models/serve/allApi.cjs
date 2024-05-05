@@ -283,6 +283,21 @@ app.all("/api/pet/getPetByMasterTel", async (req, res) => {
         query: req.query
     })
 })
+app.all("/api/pet/getPetBySerial", async (req, res) => {
+    let ins;
+    try {
+        ins = await petServe.getPetBySerial(req.query.serial)
+    } catch (error) {
+        ins = error;
+    }
+    const typeofIns = typeof ins
+    console.log(req.query.tel, typeofIns);
+    res.send({
+        data: ins,
+        msg: typeofIns !== "string" ? (typeofIns === "object" && ins ? "查询成功" : "站内无该宠物") : ins,
+        query: req.query
+    })
+})
 
 
 app.all("/api/pet/getAllPetByType", async (req, res) => {
@@ -294,11 +309,11 @@ app.all("/api/pet/getAllPetByType", async (req, res) => {
         ins = error;
     }
     const typeofIns = typeof ins
-    // console.log(req.query.tel, typeofIns);
+    console.log( typeofIns);
     res.send({
         data: ins.ins,
         total: ins.total,
-        msg: typeofIns !== "string" ? (typeofIns === "object" && ins.length ? "查询成功" : "用户无宠物") : ins,
+        msg: typeofIns !== "string" ? (typeofIns === "object" && ins.length ? "查询成功" : "无该类型宠物") : ins,
         query: req.query
     })
 })

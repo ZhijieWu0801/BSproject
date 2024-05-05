@@ -35,6 +35,11 @@ const Pet = sequelize.define(
       type: DataTypes.STRING,
       allowNull: true,
       comment: `宠物照片`,
+    },
+    returnReason:{
+      type: DataTypes.STRING,
+      allowNull: true,
+      comment: `宠物照片`,
     }
   },
   {

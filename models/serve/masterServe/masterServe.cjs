@@ -22,12 +22,12 @@ exports.signIn = async (obj) => {
         return "电话已被占用"
     }
     let data = {}
-    console.log(MasterFileMap);
+    // console.log(MasterFileMap);
     data = commonServeFunc.isMap(MasterFileMap, obj)
     data.loginToken = commonServeFunc.getToken()
     // console.log("data:::",data);
     const ins = await Models.PetMaster.create(data)
-    console.log(ins.toJSON());
+    // console.log(ins.toJSON());
     return "注册成功"
 }
 /**
@@ -49,7 +49,7 @@ exports.updateMaster = async (obj) => {
             MPwd: data.MPwd
         }
     })
-    console.log(ins);
+    // console.log(ins);
     if (ins[0] === 0) {
         return "更新失败"
     }
@@ -62,7 +62,7 @@ exports.updateMaster = async (obj) => {
  */
 exports.deleteMaster = async (obj) => {
     const data = commonServeFunc.isMap(MasterFileMap, obj)
-    console.log(data);
+    // console.log(data);
     const ins = await Models.PetMaster.destroy({
         where: {
             MTel: data.MTel,
@@ -77,7 +77,7 @@ exports.deleteMaster = async (obj) => {
  * @returns 
  */
 exports.upDataMasterTel = async (obj) => {
-    console.log(obj);
+    // console.log(obj);
     const ins = await Models.PetMaster.update({
         MTel: obj.newTel
     }, {
@@ -86,7 +86,7 @@ exports.upDataMasterTel = async (obj) => {
             MPwd: Models.md5(obj.pwd)
         }
     })
-    console.log(ins, 1233333);
+    // console.log(ins, 1233333);
     if (ins[0] === 0) {
         return "删除失败"
     }
@@ -122,7 +122,7 @@ exports.linkPet = async (obj) => {
     })
     if (!master) {
         return {
-            mas: `用户未注册`,
+            msg: `用户未注册`,
             code: 404,
         }
     }
@@ -130,9 +130,9 @@ exports.linkPet = async (obj) => {
     pet.update({
         PetMasterId: masterId
     })
-    console.log(pet.toJSON(), "--------", master.toJSON());
+    // console.log(pet.toJSON(), "--------", master.toJSON());
     return {
-        mas: `更新成功`,
+        msg: `操作成功`,
         code: 200,
     }
 }
@@ -141,7 +141,7 @@ exports.linkPet = async (obj) => {
  * 宠物归还
  * @param {*} obj { tel , serial} 
  */
-exports.disconnectPetLink = async (obj)=>{
+exports.disconnectPetLink = async (obj) => {
     const pet = await Models.Pet.findOne({
         where: {
             serial: obj.serial
@@ -166,17 +166,25 @@ exports.disconnectPetLink = async (obj)=>{
     })
     if (!master) {
         return {
-            mas: `用户未注册`,
+            msg: `用户未注册`,
             code: 404,
+        }
+    }
+    console.log(master.id, "----------", pet.PetMasterId);
+    if (master.id !== pet.PetMasterId) {
+        return {
+            msg: `操作失败，宠物与主人关系不对应，请查证后再试`,
+            code: 100
         }
     }
     // const masterId = master.toJSON().id
     pet.update({
         PetMasterId: null,
+        returnReason: obj.returnReason,
     })
-    console.log(pet.toJSON(), "--------", master.toJSON());
+    // console.log(pet.toJSON(), "--------", master.toJSON());
     return {
-        mas: `更新成功`,
+        msg: `更新成功`,
         code: 200,
     }
 }
