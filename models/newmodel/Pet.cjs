@@ -39,7 +39,7 @@ const Pet = sequelize.define(
     returnReason:{
       type: DataTypes.STRING,
       allowNull: true,
-      comment: `宠物照片`,
+      comment: `退还原因`,
     }
   },
   {

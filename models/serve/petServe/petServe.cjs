@@ -3,8 +3,7 @@ const Models = require("../servicesComon.cjs")
 const commonServeFunc = require("../commonServeFunc.cjs")
 const {
     base64ToFile,
-    baseUrl,
-    getImg
+    baseUrl
 } = require("../../../savefile.cjs")
 const FileMap = {
     name: "PName",
@@ -45,21 +44,27 @@ function getAccessToken() {
 const tocken = getAccessToken();
 
 
-async function select(){
+exports.search = async (base64, res) => {
+    // console.log(base64);
     options = {
         'method': 'POST',
-        'url': 'https://aip.baidubce.com/rest/2.0/image-classify/v1/realtime_search/similar/search?access_token=' + await this.getAccessToken(),
+        'url': 'https://aip.baidubce.com/rest/2.0/image-classify/v1/realtime_search/similar/search?access_token=' + await getAccessToken(),
         'headers': {
-                'Content-Type': 'application/x-www-form-urlencoded'
+            'Content-Type': 'application/x-www-form-urlencoded'
         },
         form: {
-
+            'image': base64,
+            'pn': '0',
+            'rn': '10', //拿开始的10个，最相似的10个
         }
     };
 
     request(options, function (error, response) {
         if (error) throw new Error(error);
         console.log(response.body);
+        res.send({
+            data: JSON.parse(response.body)
+        })
     });
 }
 
@@ -79,43 +84,70 @@ async function select(){
  * @returns 宠物列表
  */
 exports.getPetByMasterTel = async (tel) => {
-    const PetMasterId = await commonServeFunc.getIdByTel(tel)
+    // try {
+
+    const PetMasterId = await commonServeFunc.getIdByTel(tel);
     if (!PetMasterId) {
         return "未找到用户"
     }
     const ins = await Models.Pet.findAll({
-        include: Models.PetMaster,
+        include: [{
+            model: Models.PetMaster,
+            as: "petMaster"
+        }],
         where: {
             PetMasterId
         }
     }).then((pets) => {
         const data = pets.map(pet => {
-            const Json = pet && pet.toJSON()
+            const Json = pet && pet.toJSON();
             return Json
         })
         return data
     })
+    // } catch (error) {
+    //     console.log(error);
+    // }
+    // try {
 
-    console.log(ins);
-    return ins.length ? ins : "未找到用户的宠物"
+    const petData = await Promise.all(
+        ins.map(async (element) => {
+            if (element.PetImg) {
+                element.img = await commonServeFunc.getImg(element.PetImg);
+            }
+            return element;
+        })
+    );
+    console.log(petData, 123);
+    return petData.length ? petData : "未找到用户的宠物"
+    // } catch (error) {
+    //     console.log(error);
+    // }
 }
 
-exports.getPetBySerial = async (serial) => {
-    const ins = await Models.Pet.findOne({
-        where: {
-            serial: serial
-        }
-    })
-    const path = baseUrl + "\\" + serial;
-    if (ins) {
-        const data = ins.toJSON();
-        console.log(123,path);
-        data.img =  getImg(path)
-        console.log(data.img,123456);
-        return data
-    }
-    return null
-}
+// exports.getPetBySerial = async (serial) => {
+//     console.log(111);
+//     // return 
+//     const ins = await Models.Pet.findOne({
+//         where: {
+//             serial: serial
+//         }
+//     })
+//     // const path = baseUrl + "\\" + serial;
+//     if (!ins) {
+//         return null
+//     }
+//     const data = ins.toJSON();
+//     const petData = await Promise.all(
+//         data.map(async (element) => {
+//             if (element.PetImg) {
+//                 element.img = await commonServeFunc.getImg(element.PetImg);
+//             }
+//             return element;
+//         })
+//     );
+//     return petData
+// }
 
 /**
  * 添加一个宠物
@@ -134,20 +166,22 @@ exports.addPet = async (obj) => {
     // console.log(data, 666);
     const ins = await Models.Pet.create(data);
     if (ins) {
-            base64ToFile(img, serial);
-            console.log(tocken,556666);
+        base64ToFile(img, serial);
+        // console.log(tocken, 556666);
+        console.log(img);
         let options = {
             'method': 'POST',
-            'url': 'https://aip.baidubce.com/rest/2.0/image-classify/v1/realtime_search/similar/add?access_token=' + this.getAccessToken(),
+            'url': 'https://aip.baidubce.com/rest/2.0/image-classify/v1/realtime_search/similar/add?access_token=' + await getAccessToken(),
             'headers': {
                 'Content-Type': 'application/x-www-form-urlencoded'
             },
             // image 可以通过 getFileContentAsBase64("C:\fakepath\微信图片_20231009164814.png") 方法获取,
             form: {
-                'image': img,
+                'image': aaa, //base64数据
                 'brief': `{"serial":${serial}}`
             }
         };
+        console.log(1122);
         request(options, function (error, response) {
             if (error) throw new Error(error);
             console.log(response.body);
@@ -244,20 +278,30 @@ exports.updatePet = async (obj) => {
  * @returns 宠物信息
  */
 exports.getPetBySerial = async (serial, not = false) => {
-    const ins = await Models.Pet.findOne({
-        where: {
-            serial
-        },
-        include: {
-            model: Models.PetMaster,
-            as: 'petMaster'
+    try {
+
+        const ins = await Models.Pet.findOne({
+            where: {
+                serial
+            },
+            include: {
+                model: Models.PetMaster,
+                as: 'petMaster'
+            }
+        })
+        if (not) {
+            return ins
         }
-    })
-    console.log(ins, "================================");
-    if (not) {
-        return ins
+        const data = ins && ins.toJSON();
+        console.log(data);
+        const petData =
+            data.PetImg &&
+            (data.img = await commonServeFunc.getImg(data.PetImg))
+        console.log(petData);
+    } catch (error) {
+        console.log(error);
     }
-    return ins && ins.toJSON()
+    return petData
 }
 
 
@@ -268,40 +312,57 @@ exports.getPetBySerial = async (serial, not = false) => {
  * @returns 
  */
 exports.getAllPetByType = async (obj, not = false) => {
-    console.log(obj, petText2Type2[obj.species], 2222);
-    const totalIns = await Models.Pet.findAll({
-        where: {
-            species: petType2Text[petText2Type2[obj.species]],
+    // console.log(obj, petText2Type2[obj.species], 2222);
+    try {
+        //所有的长度
+        const totalIns = await Models.Pet.findAll({
+            where: {
+                species: petType2Text[petText2Type2[obj.species]],
+            }
+        })
+        // console.log(totalIns);
+        // const total = totalIns.length;
+        const ins = await Models.Pet.findAll({
+            where: {
+                species: petType2Text[petText2Type2[obj.species]],
+            },
+            limit: obj.pageSize ? +obj.pageSize : null,
+            offset: obj.pageSize && obj.page ? (+obj.page - 1) * +obj.pageSize : null,
+            include: {
+                model: Models.PetMaster,
+                as: 'petMaster'
+            }
+        })
+        if (!ins) {
+            // console.log(ins,555555);
+            return "未查询到"
         }
-    })
-    // console.log(totalIns.length);
-    // const total = totalIns.length;
-    const ins = await Models.Pet.findAll({
-        where: {
-            species: petType2Text[petText2Type2[obj.species]],
-        },
-        limit: obj.pageSize ? +obj.pageSize : null,
-        offset: obj.pageSize && obj.page ? (+obj.page - 1) * +obj.pageSize : null,
-        include: {
-            model: Models.PetMaster,
-            as: 'petMaster'
+        if (not) {
+            console.log(ins, 6666);
+            return {
+                ins: ins,
+                total: totalIns.length
+            }
         }
-    })
-    // ins.push({total:totalIns.length})
-    // console.log(ins,44444444444);
-    if (!ins) {
-        // console.log(ins,555555);
-        return "未查询到"
-    }
-    if (not) {
-        // console.log(ins,6666);
+        // const data = ins.toJSON()
+        // console.log(ins, ins.toJSON());
+        const petData = await Promise.all(
+            ins.map(async (element) => {
+                const item = element.toJSON();
+                if (item.PetImg) {
+                    item.img = await commonServeFunc.getImg(item.PetImg);
+                }
+                return item;
+            })
+        );
+        // console.log(petData, 777);
         return {
-            ins: ins,
+            ins: petData,
             total: totalIns.length
         }
+    } catch (error) {
+        console.log(error);
     }
-    // console.log(ins,777);
-    return ins.toJSON()
 }
 
 /**
@@ -310,13 +371,19 @@ exports.getAllPetByType = async (obj, not = false) => {
  */
 exports.getAllPets = async () => {
     const ins = await Models.Pet.findAll();
-    console.log(ins);
-    let arr = [];
-    if (ins) {
-        ins.forEach(element => {
-            arr.push(element.toJSON())
-        });
-        return arr
+    // console.log(ins);
+    if (!ins || ins.length === 0) {
+        return "站内无宠物"
     }
-    return "站内无宠物"
+    const petData = await Promise.all(
+        ins.map(async (element) => {
+            const json = element.toJSON();
+            if (json.PetImg) {
+                json.img = await commonServeFunc.getImg(json.PetImg);
+            }
+            return json;
+        })
+    );
+
+    return petData;
 }

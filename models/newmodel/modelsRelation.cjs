@@ -1,8 +1,8 @@
 //模型连接
-const pet = require("./Pet.cjs")
+const Pet = require("./Pet.cjs")
 const PetMuster = require("./PetMaster.cjs")
-const Admin = require("./admin.cjs")
+const Admin = require("./Admin.cjs")
 
-Admin.hasMany(pet) //建立外键
-PetMuster.hasMany(pet) //建立外键
+Admin.hasMany(Pet) //建立外键
+PetMuster.hasMany(Pet) //建立外键
 // require('./dbLink.cjs')

@@ -1,3 +1,4 @@
+
 const Models = require("./servicesComon.cjs")
 const {
     petType2Text,
@@ -60,36 +61,17 @@ exports.upload = (fileName, fileData) => {
         }
     });
 }
-exports.getImg = async (req,res) => {
-    const params = {
-        Bucket: 'bs-img-cos-1317764751',
-        Region: 'ap-beijing',
-        Key: '/img/M-202405051113560099.png', // 文件名
-    };
-    cos.getObject(params, function (err, data) {
-        // img = data.Body.toString('base64');
-        if (err) {
-            console.error('获取文件失败:', err);
-        } else {
-            // data.Body 包含了文件内容的 buffer
-              console.log('文件内容:', data.Body.toString('base64'));
-            img = data.Body.toString('base64').replace('dataimage/pngbase64', "data:image/png;base64,");;
-            console.log(img,9999);
-            res.send({
-                img: img
-            })
-            // console.log(111);
-            // 可以将文件内容保存到本地
-            //   const fs = require('fs');
-            //   fs.writeFileSync('downloaded_image.png', data.Body);
-            // return data.Body.toString('base64');
-            console.log('文件已保存');
-        }
-        // const img = fs.readFileSync("downloaded_image.png")
-        // console.log(img);
-    })
-    // console.log(img);
-    // return img
+exports.getImg = async (path) => {
+    console.log(111);
+    if(!path){
+        return null
+    }
+    // console.log(123);
+    const name = path.replace(/\\/g,"/") +'.png'
+    const data = await fs.promises.readFile(name);
+    return data.toString('base64')
+
+
 }
 // 处理图片上传的 POST 请求
 // app.post('/upload', upload.single('image'), (req, res) => {

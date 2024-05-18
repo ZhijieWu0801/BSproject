@@ -21,15 +21,15 @@ wss.on('connection', function connection(ws) {
         const utf8String = decoder.decode(binaryData);
         const standing = JSON.parse(utf8String).standing;
         const userId = JSON.parse(utf8String).userId;
-        console.log('收到消息:',utf8String, JSON.parse(utf8String),standing);
-        if (standing === 0 && findWS(Admin,ws)) {
+        console.log('收到消息:', utf8String, JSON.parse(utf8String), standing);
+        if (standing === 0 && findWS(Admin, ws, userId)) {
             console.log("添加到Admin");
             Admin.push({
                 ws,
                 id: JSON.parse(utf8String).userId
             });
         }
-        if (standing === 100 && findWS(clients,ws)) {
+        if (standing === 100 && findWS(clients, ws)) {
             console.log("添加到yonghu");
             clients.push({
                 ws,
@@ -57,13 +57,13 @@ wss.on('connection', function connection(ws) {
         // 在用户端断开连接时，将其从 clients 数组中移除
         // const index1 = clients.indexOf(ws);
         if (!!user) {
-            console.log("删除用户",user);
+            console.log("删除用户", user);
             clients.splice(user.index, 1);
         }
         // 在管理员端断开连接时，将其从 Admin 数组中移除
         // const index2 = Admin.indexOf(ws);
         if (!!admin) {
-            console.log("删除管理员",admin);
+            console.log("删除管理员", admin);
             Admin.splice(admin.index, 1);
         }
     });
@@ -71,7 +71,7 @@ wss.on('connection', function connection(ws) {
 
 function findWS(arr, ws) {
     let user = {}
-    console.log("arr",arr);
+    console.log("arr", arr);
     for (let i = 0; i < arr.length; i++) {
         if (arr[i].ws === ws) {
             user = {
@@ -83,6 +83,17 @@ function findWS(arr, ws) {
     }
     console.log(user);
     return user
+}
+
+function findWsById(arr, id) {
+    let ws = null;
+    for (let i = 0; i < arr.length; i++) {
+        if (arr[i].id == id) {
+            ws = arr[i].ws;
+            break
+        }
+    }
+    return ws
 }
 
 // 发送消息给所有客户端的函数

@@ -5,6 +5,7 @@ const commonServe = require("./commonServeFunc.cjs")
 const adminServe = require("./adminServe/adminServe.cjs")
 const masterServe = require("./masterServe/masterServe.cjs")
 const petServe = require("./petServe/petServe.cjs")
+const cos = require("./petServe/cos.cjs")
 const WSServe = require("./WSServe.cjs")
 
 app.all("/api/admin/createAdmin", async (req, res) => {
@@ -250,12 +251,29 @@ app.all("/api/master/disconnectPetLink", async (req, res) => {
 
 
 
-
+app.all('/upload', async (req, res) => {
+    // const url = await cos.putImgAndGetUrl(res, req.query.serial, req.query.img)
+    // console.log(url, 456666);
+    // res.send({
+    //     img: url
+    // })
+})
 
 
 
 app.all("/api/pet/getImg", async (req, res) => {
-    const ins = await commonServe.getImg(req, res).then(r=>{
+    const ins = await commonServe.getImg(req, res)
+
+        res.send({
+            img: ins
+        })
+})
+/**
+ * 相似图片检索
+ */
+app.all("/api/pet/search", async (req, res) => {
+    // console.log(req);
+    const ins = await petServe.search(req.query.img, res).then(r => {
 
         // res.send({
         //     img: r
@@ -293,7 +311,7 @@ app.all("/api/pet/getAllPets", async (req, res) => {
 })
 
 app.all("/api/pet/getPetByMasterTel", async (req, res) => {
-    console.log(1111);
+    // console.log(1111);
     let ins;
     try {
         ins = await petServe.getPetByMasterTel(req.query.tel)
@@ -301,7 +319,7 @@ app.all("/api/pet/getPetByMasterTel", async (req, res) => {
         ins = error;
     }
     const typeofIns = typeof ins
-    console.log(req.query.tel, typeofIns);
+    // console.log(req.query.tel, typeofIns);
     res.send({
         data: ins,
         msg: typeofIns !== "string" ? (typeofIns === "object" && ins.length ? "查询成功" : "用户无宠物") : ins,
@@ -316,7 +334,8 @@ app.all("/api/pet/getPetBySerial", async (req, res) => {
         ins = error;
     }
     const typeofIns = typeof ins
-    console.log(req.query.tel, typeofIns, JSON.stringify(ins));
+    // return 
+    // console.log(req.query.tel, typeofIns, JSON.stringify(ins));
     res.send({
         data: ins,
         msg: typeofIns !== "string" ? (typeofIns === "object" && ins ? "查询成功" : "站内无该宠物") : ins,
@@ -329,16 +348,16 @@ app.all("/api/pet/getAllPetByType", async (req, res) => {
     // console.log(1111);
     let ins;
     try {
-        ins = await petServe.getAllPetByType(req.query, true)
+        ins = await petServe.getAllPetByType(req.query)
     } catch (error) {
         ins = error;
     }
     const typeofIns = typeof ins
-    console.log(typeofIns);
+    // console.log(ins,typeofIns,ins.length);
     res.send({
         data: ins.ins,
         total: ins.total,
-        msg: typeofIns !== "string" ? (typeofIns === "object" && ins.length ? "查询成功" : "无该类型宠物") : ins,
+        msg: typeofIns !== "string" ? (typeofIns === "object" && ins.total ? "查询成功" : "无该类型宠物") : ins,
         query: req.query
     })
 })
