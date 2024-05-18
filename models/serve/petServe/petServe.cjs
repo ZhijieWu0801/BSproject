@@ -30,6 +30,7 @@ function getAccessToken() {
 
     let options = {
         'method': 'POST',
+        'url': 'https://aip.baidubce.com/oauth/2.0/token?grant_type=client_credentials&client_id=' + AK + '&client_secret=' + SK,
     }
     return new Promise((resolve, reject) => {
         request(options, (error, response) => {
