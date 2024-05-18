@@ -6,6 +6,7 @@ const {
 const {
     v4: uuidv4
 } = require('uuid');
+const fs = require('fs');
 // const uuid = uuidv4();
 // console.log(uuid);
 
@@ -17,6 +18,104 @@ const {
 //     "猫": "M",
 //     "狗": "D"
 // }
+
+
+
+
+
+
+const SecretId = "AKIDliSxFNL6oLn466tWw7XosocHm4B5nKfn";
+const SecretKey = "Rkyzut9LaospbCsRoGk5EF984wiMr9HM";
+
+
+const COS = require('cos-nodejs-sdk-v5');
+// const express = require('express');
+// const multer = require('multer');
+
+// const app = express();
+
+// 配置 COS SDK
+const cos = new COS({
+    SecretId,
+    SecretKey,
+});
+
+// 配置 multer 来处理文件上传
+// const upload = multer({ dest: 'uploads/' });
+exports.upload = (fileName, fileData) => {
+    const params = {
+        Bucket: 'bs-img-cos-1317764751',
+        Region: 'ap-beijing',
+        Key: 'img/' + fileName + ".png",
+        Body: fileData,
+    };
+
+    cos.putObject(params, (err, data) => {
+        if (err) {
+            console.error(err);
+            return err
+        } else {
+            console.log("上传成功");
+            return "上传成功"
+        }
+    });
+}
+exports.getImg = async (req,res) => {
+    const params = {
+        Bucket: 'bs-img-cos-1317764751',
+        Region: 'ap-beijing',
+        Key: '/img/M-202405051113560099.png', // 文件名
+    };
+    cos.getObject(params, function (err, data) {
+        // img = data.Body.toString('base64');
+        if (err) {
+            console.error('获取文件失败:', err);
+        } else {
+            // data.Body 包含了文件内容的 buffer
+              console.log('文件内容:', data.Body.toString('base64'));
+            img = data.Body.toString('base64').replace('dataimage/pngbase64', "data:image/png;base64,");;
+            console.log(img,9999);
+            res.send({
+                img: img
+            })
+            // console.log(111);
+            // 可以将文件内容保存到本地
+            //   const fs = require('fs');
+            //   fs.writeFileSync('downloaded_image.png', data.Body);
+            // return data.Body.toString('base64');
+            console.log('文件已保存');
+        }
+        // const img = fs.readFileSync("downloaded_image.png")
+        // console.log(img);
+    })
+    // console.log(img);
+    // return img
+}
+// 处理图片上传的 POST 请求
+// app.post('/upload', upload.single('image'), (req, res) => {
+//   const params = {
+//     Bucket: 'bs-img-cos-1317764751',
+//     Region: 'ap-beijing',
+//     Key: 'img/' + req.file.originalname,
+//     Body: req.file.buffer,
+//   };
+
+//   cos.putObject(params, (err, data) => {
+//     if (err) {
+//       console.error(err);
+//       res.status(500).send('Internal Server Error');
+//     } else {
+//       res.send('Image uploaded successfully!');
+//     }
+//   });
+// });
+
+
+
+
+
+
+
 /**
  * 第一个参数是目标对象
  * 第二个参数是需要映射的对象
@@ -35,7 +134,7 @@ exports.isMap = (mapObj, obj) => {
             data[key] = new Date((obj[item])).getTime();
 
         } else {
-            data[key] = obj[item]
+            (data[key] = obj[item])
         }
     }
     return data
@@ -137,7 +236,7 @@ exports.login = async (obj) => {
                 MPwd: obj.pwd
             }
         })
-    console.log(ins?.toJSON(), 111111);
+    // console.log(ins?.toJSON(), 111111);
     return ins ? {
         data: ins,
         msg: "登陆成功",

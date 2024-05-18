@@ -1,16 +1,77 @@
+const fs = require('fs');
 const Models = require("../servicesComon.cjs")
 const commonServeFunc = require("../commonServeFunc.cjs")
+const {
+    base64ToFile,
+    baseUrl,
+    getImg
+} = require("../../../savefile.cjs")
 const FileMap = {
     name: "PName",
     master: "PetMaster",
     species: "species",
     serial: "serial",
+    img_B: "PetImg",
 }
 const {
     petText2Type,
     petText2Type2,
     petType2Text
 } = require("../common/const.cjs")
+
+const request = require('request')
+const AK = "ceFAXkERb8mNh8oQjqJu2qKq";
+const SK = "9ykC2KmFOJgp1ZQgAFlVstjKQ90MZamA"
+/**
+ * 使用 AK，SK 生成鉴权签名（Access Token）
+ * @return string 鉴权签名信息（Access Token）
+ */
+function getAccessToken() {
+
+    let options = {
+        'method': 'POST',
+    }
+    return new Promise((resolve, reject) => {
+        request(options, (error, response) => {
+            if (error) {
+                reject(error)
+            } else {
+                resolve(JSON.parse(response.body).access_token)
+            }
+        })
+    })
+}
+const tocken = getAccessToken();
+
+
+async function select(){
+    options = {
+        'method': 'POST',
+        'url': 'https://aip.baidubce.com/rest/2.0/image-classify/v1/realtime_search/similar/search?access_token=' + await this.getAccessToken(),
+        'headers': {
+                'Content-Type': 'application/x-www-form-urlencoded'
+        },
+        form: {
+
+        }
+    };
+
+    request(options, function (error, response) {
+        if (error) throw new Error(error);
+        console.log(response.body);
+    });
+}
+
+// function base64ToFile(base64Data, filePath) {
+//     // 将base64数据解码
+//     const dataBuffer = Buffer.from(base64Data, 'base64');
+
+//     // 将数据写入文件
+//     fs.writeFileSync(filePath, dataBuffer);
+
+//     console.log('文件已保存到：', filePath);
+// }
+
 /**
  * 通过主人的电话查询名下的所有宠物
  * @param {String} tel 
@@ -33,6 +94,7 @@ exports.getPetByMasterTel = async (tel) => {
         })
         return data
     })
+
     console.log(ins);
     return ins.length ? ins : "未找到用户的宠物"
 }
@@ -43,7 +105,15 @@ exports.getPetBySerial = async (serial) => {
             serial: serial
         }
     })
-    return ins ? ins.toJSON() : null
+    const path = baseUrl + "\\" + serial;
+    if (ins) {
+        const data = ins.toJSON();
+        console.log(123,path);
+        data.img =  getImg(path)
+        console.log(data.img,123456);
+        return data
+    }
+    return null
 }
 
 /**
@@ -53,10 +123,39 @@ exports.getPetBySerial = async (serial) => {
  */
 exports.addPet = async (obj) => {
     // console.log(petText2Type[obj.species], obj);
-    const data = commonServeFunc.isMap(FileMap, obj)
-    data.serial = `${petText2Type[obj.species]}-${commonServeFunc.getRandomNum()}`
-    console.log(data, 666);
-    const ins = await Models.Pet.create(data)
+    const aaa = obj.img.split(",")[1]
+    img = Buffer.from(aaa, 'base64');
+    serial = `${petText2Type[obj.species]}-${commonServeFunc.getRandomNum()}`
+    obj.img_B = baseUrl + `\\` + serial;
+    const data = commonServeFunc.isMap(FileMap, obj);
+    data.serial = serial;
+    data.img = baseUrl + `\\` + serial;
+    // console.log(data, 666);
+    const ins = await Models.Pet.create(data);
+    if (ins) {
+            base64ToFile(img, serial);
+            console.log(tocken,556666);
+        let options = {
+            'method': 'POST',
+            'url': 'https://aip.baidubce.com/rest/2.0/image-classify/v1/realtime_search/similar/add?access_token=' + this.getAccessToken(),
+            'headers': {
+                'Content-Type': 'application/x-www-form-urlencoded'
+            },
+            // image 可以通过 getFileContentAsBase64("C:\fakepath\微信图片_20231009164814.png") 方法获取,
+            form: {
+                'image': img,
+                'brief': `{"serial":${serial}}`
+            }
+        };
+        request(options, function (error, response) {
+            if (error) throw new Error(error);
+            console.log(response.body);
+        });
+    }
+    // if(ins){
+    const res = commonServeFunc.upload(data.serial, obj.img);
+    console.log(res, 777);
+    // }
     return ins && ins.toJSON()
 }
 
@@ -147,8 +246,13 @@ exports.getPetBySerial = async (serial, not = false) => {
     const ins = await Models.Pet.findOne({
         where: {
             serial
+        },
+        include: {
+            model: Models.PetMaster,
+            as: 'petMaster'
         }
     })
+    console.log(ins, "================================");
     if (not) {
         return ins
     }
@@ -197,4 +301,21 @@ exports.getAllPetByType = async (obj, not = false) => {
     }
     // console.log(ins,777);
     return ins.toJSON()
+}
+
+/**
+ * 
+ * @returns 获取站内所有宠物
+ */
+exports.getAllPets = async () => {
+    const ins = await Models.Pet.findAll();
+    console.log(ins);
+    let arr = [];
+    if (ins) {
+        ins.forEach(element => {
+            arr.push(element.toJSON())
+        });
+        return arr
+    }
+    return "站内无宠物"
 }

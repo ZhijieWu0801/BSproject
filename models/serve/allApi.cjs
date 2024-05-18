@@ -5,7 +5,7 @@ const commonServe = require("./commonServeFunc.cjs")
 const adminServe = require("./adminServe/adminServe.cjs")
 const masterServe = require("./masterServe/masterServe.cjs")
 const petServe = require("./petServe/petServe.cjs")
-
+const WSServe = require("./WSServe.cjs")
 
 app.all("/api/admin/createAdmin", async (req, res) => {
     const ins = await adminServe.createAdmin(req.query)
@@ -85,6 +85,7 @@ app.all("/api/admin/getAllAdmin", async (req, res) => {
     })
 })
 app.all("/api/pet/uniqueLettersCount", async (req, res) => {
+    // 查询表中不同字母的数量
     let ins;
     try {
         ins = await commonServe.uniqueLettersCount()
@@ -121,10 +122,11 @@ app.all("/api/login", async (req, res) => {
         ins = error;
     }
     // console.log("---",commonServe.getToken());
-    console.log(req.query);
+    // console.log(req.query, ins);
     res.send({
         ...ins,
-        query: req.query
+        query: req.query,
+        isSuccessful: !!ins
     })
 })
 
@@ -252,6 +254,14 @@ app.all("/api/master/disconnectPetLink", async (req, res) => {
 
 
 
+app.all("/api/pet/getImg", async (req, res) => {
+    const ins = await commonServe.getImg(req, res).then(r=>{
+
+        // res.send({
+        //     img: r
+        // })
+    })
+})
 app.all("/api/pet/addPet", async (req, res) => {
     // const masterActive = 
     let ins;
@@ -260,9 +270,24 @@ app.all("/api/pet/addPet", async (req, res) => {
     } catch (error) {
         ins = error;
     }
-    console.log(req.query);
+    // console.log(req.query);
     res.send({
         msg: ins,
+        query: req.query
+    })
+})
+app.all("/api/pet/getAllPets", async (req, res) => {
+    // const masterActive = 
+    let ins;
+    try {
+        ins = await petServe.getAllPets()
+    } catch (error) {
+        ins = error;
+    }
+    console.log(req.query, ins);
+    res.send({
+
+        data: ins,
         query: req.query
     })
 })
@@ -291,7 +316,7 @@ app.all("/api/pet/getPetBySerial", async (req, res) => {
         ins = error;
     }
     const typeofIns = typeof ins
-    console.log(req.query.tel, typeofIns);
+    console.log(req.query.tel, typeofIns, JSON.stringify(ins));
     res.send({
         data: ins,
         msg: typeofIns !== "string" ? (typeofIns === "object" && ins ? "查询成功" : "站内无该宠物") : ins,
@@ -309,7 +334,7 @@ app.all("/api/pet/getAllPetByType", async (req, res) => {
         ins = error;
     }
     const typeofIns = typeof ins
-    console.log( typeofIns);
+    console.log(typeofIns);
     res.send({
         data: ins.ins,
         total: ins.total,

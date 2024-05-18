@@ -1,6 +1,7 @@
 <template>
   <div class="BS-App">
     
+    <div @click="test">55555555555</div>
 
     <div class="common-layout">
     <el-container>
