@@ -1,8 +1,4 @@
 
-const SecretId = AKIDliSxFNL6oLn466tWw7XosocHm4B5nKfn;
-const SecretKey = Rkyzut9LaospbCsRoGk5EF984wiMr9HM
-
-
 const COS = require('cos-nodejs-sdk-v5');
 const express = require('express');
 const multer = require('multer');

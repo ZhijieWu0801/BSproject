@@ -21,7 +21,7 @@ const {
 
 const request = require('request')
 const AK = "ceFAXkERb8mNh8oQjqJu2qKq";
-const SK = "9ykC2KmFOJgp1ZQgAFlVstjKQ90MZamA"
+const SK = "9ykC2KmFOJgp1ZQgAFlVstjKQ90MZamA";
 /**
  * 使用 AK，SK 生成鉴权签名（Access Token）
  * @return string 鉴权签名信息（Access Token）
