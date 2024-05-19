@@ -11,6 +11,37 @@ const Pet = sequelize.define(
       allowNull: true,
       comment: `宠物名字`,
     },
+
+
+
+    PVaccine: {
+      type: DataTypes.STRING,
+      allowNull: true,
+      comment: `疫苗情况`,
+    },
+    PBirth: {
+      type: DataTypes.TIME,
+      allowNull: true,
+      comment: `出生日期`,
+    },
+    PHealth: {
+      type: DataTypes.STRING,
+      allowNull: true,
+      comment: `健康状况`,
+    },
+    PDescription: {
+      type: DataTypes.STRING,
+      allowNull: true,
+      comment: `描述`,
+    },
+    PSex: {
+      type: DataTypes.STRING,
+      allowNull: true,
+      comment: `宠物性别`,
+    },
+
+
+
     species: {
       type: DataTypes.STRING,
       allowNull: false,

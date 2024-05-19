@@ -188,3 +188,16 @@ exports.disconnectPetLink = async (obj) => {
         code: 200,
     }
 }
+
+exports.getMasterByTel = async (tel) => {
+    console.log(tel)
+    const ins = await Models.PetMaster.findOne({
+        where: {
+            MTel: tel
+        }
+    })
+    if (!ins) {
+        return "未找到用户"
+    }
+    return ins.toJSON();
+}

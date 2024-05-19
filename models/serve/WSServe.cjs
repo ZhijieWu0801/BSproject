@@ -19,35 +19,49 @@ wss.on('connection', function connection(ws) {
 
         // 解码二进制数据并转换为字符串
         const utf8String = decoder.decode(binaryData);
-        const standing = JSON.parse(utf8String).standing;
-        const userId = JSON.parse(utf8String).userId;
-        console.log('收到消息:', utf8String, JSON.parse(utf8String), standing);
-        if (standing === 0 && findWS(Admin, ws, userId)) {
+        // console.log(JSON.parse(utf8String), 9999);
+        const messageObj = JSON.parse(utf8String);
+        const standing = messageObj.standing;
+        const userId = messageObj.userId;
+        const messages = messageObj.message;
+        console.log('收到消息:', messageObj, standing);
+        if (standing === 0 && !findWsById(Admin, userId, ws)) {
             console.log("添加到Admin");
             Admin.push({
                 ws,
-                id: JSON.parse(utf8String).userId
+                id: messageObj.userId
             });
         }
-        if (standing === 100 && findWS(clients, ws)) {
+        if (standing === 100 && !findWsById(clients, userId, ws)) {
             console.log("添加到yonghu");
             clients.push({
                 ws,
-                id: JSON.parse(utf8String).userId
+                id: messageObj.userId
             });
 
         }
-        let postUser
+
+
+
+        if (standing === 100) {//100代表用户
+            toAdmin(message, Admin)
+        }
         if (standing === 0) {
-            postUser = findWS(Admin, ws);
+            toUser(message, clients)
         }
-        if (standing === 100) {
-            postUser = findWS(clients, ws);
-        }
-        console.log(postUser);
-        sendMsg(ws, utf8String, postUser?.ws);
-        // broadcast("已收到");
-        broadcastOne(ws, "收到");
+        // let postUser
+        // if (standing === 0) {
+        //     postUser = findWsById(Admin, userId, ws);
+
+        // }
+        // if (standing === 100) {
+        //     postUser = findWsById(clients, userId, ws);
+        //     // broadcast(clients,111)
+        // }
+        // // console.log("postUser==>",postUser);
+        // sendMsg(ws, messages, userId);
+        // // broadcast("已收到");
+        // broadcastOne(ws, "收到");
     });
 
     ws.on('close', function () {
@@ -71,7 +85,7 @@ wss.on('connection', function connection(ws) {
 
 function findWS(arr, ws) {
     let user = {}
-    console.log("arr", arr);
+    // console.log("arr", arr);
     for (let i = 0; i < arr.length; i++) {
         if (arr[i].ws === ws) {
             user = {
@@ -81,13 +95,14 @@ function findWS(arr, ws) {
             return
         }
     }
-    console.log(user);
+    // console.log(user);
     return user
 }
 
 function findWsById(arr, id) {
     let ws = null;
     for (let i = 0; i < arr.length; i++) {
+        // console.log(arr[i].id, id);
         if (arr[i].id == id) {
             ws = arr[i].ws;
             break
@@ -100,9 +115,10 @@ function findWsById(arr, id) {
 // 如果一个客户端发送消息后，其他的客户端都能收到服务器返回的消息，则为服务器主动给客户端发了消息
 function broadcast(arr, data) {
     const array = arr
-    console.log(array);
+    // console.log(array);
     array.forEach(client => {
-        client.send(data);
+        // console.log(client,6666);
+        client.ws.send(data);
     });
 }
 
@@ -112,17 +128,111 @@ function broadcastOne(ws, message) {
 }
 
 function sendMsg(ws, message, postUserId) {
-    const isYonghu = clients.indexOf(ws) !== -1;
-    const isAdmin = Admin.indexOf(ws) !== -1;
-    const data = {
+
+    // const isYonghu = clients.indexOf(ws) !== -1;
+    // const isAdmin = Admin.indexOf(ws) !== -1;
+    const isYonghu = findWsById(clients, postUserId);
+    const isAdmin = findWsById(Admin, postUserId);
+    // console.log(isYonghu, isAdmin,clients ,Admin);
+    // console.log(!!isYonghu, !!isAdmin);
+    const data = JSON.stringify({
         message,
         postUserId
-    }
+    })
+    // console.log(message, "========")
     if (isYonghu) {
-        broadcast(Admin, data)
+        broadcast(Admin, "data")
     } else if (isAdmin) {
-        broadcast(clients, data);
+        broadcast(clients, "data");
 
     }
 
 }
+
+
+
+function toAdmin(message, Admin) {
+    /*
+    用户消息
+    {
+      userId: '12222222222223333',
+      standing: 100,
+      content: '这是来自用户的消息',
+      timestamp: 1716111361891,
+      message: {
+        result: true,
+        petSerial: 'M-202404010742212521',
+        masterTel: '12222222222223333',
+        masterId: '12222222222223333'
+      }
+    }
+    */
+
+    // 二进制数据（示例）
+    const binaryData = new Uint8Array(message);
+
+    // 创建一个 TextDecoder 对象
+    const decoder = new TextDecoder('utf-8');
+
+    // 解码二进制数据并转换为字符串
+    const utf8String = decoder.decode(binaryData);
+    console.log(utf8String, 999);
+    const obj = JSON.parse(utf8String);
+
+    console.log("toAdmin===>", obj);
+    const reqMessage = JSON.stringify(obj.message);
+    Admin.forEach(admin => {
+        admin.ws.send(reqMessage)
+    })
+}
+
+
+function toUser(message, clients) {
+    /*{
+        管理员的 消息
+      userId: '18580528913',
+      standing: 0,
+      content: '这是来自管理员的消息',
+      timestamp: 1716111667445,
+      message: {
+        result: true,
+        petSerial: 'M-202405051113560099',
+        masterTel: '11111111111122',
+        masterId: 36
+      }
+    } */
+    // 二进制数据（示例）
+    const binaryData = new Uint8Array(message);
+
+    // 创建一个 TextDecoder 对象
+    const decoder = new TextDecoder('utf-8');
+
+    // 解码二进制数据并转换为字符串
+    const utf8String = decoder.decode(binaryData);
+    
+    const obj = JSON.parse(utf8String);
+    // const reqMessage = JSON.stringify(utf8String.message);
+    console.log(obj,111122);
+    if (!obj.message) {
+        return
+    }
+    let userWs = null;
+    for (let i = 0; i < clients.length; i++) {
+        console.log(clients,456);
+        if (clients[i].id === obj.message.masterTel) {
+            userWs = clients[i].ws;
+            break
+        }
+    }
+    const reqMessage = JSON.stringify({
+        adminId: obj.userId,
+        message: obj.message
+    })
+    console.log("toUser===>", reqMessage);
+    console.log(userWs)
+    userWs && userWs.send(reqMessage);
+}
+
+// function adminToServer(message,clients){
+
+// }

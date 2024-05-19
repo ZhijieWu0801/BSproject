@@ -293,15 +293,15 @@ exports.getPetBySerial = async (serial, not = false) => {
             return ins
         }
         const data = ins && ins.toJSON();
-        console.log(data);
+        // console.log(data);
         const petData =
             data.PetImg &&
             (data.img = await commonServeFunc.getImg(data.PetImg))
-        console.log(petData);
+        // console.log(petData);
+        return data
     } catch (error) {
         console.log(error);
     }
-    return petData
 }
 
 
@@ -369,21 +369,30 @@ exports.getAllPetByType = async (obj, not = false) => {
  * 
  * @returns 获取站内所有宠物
  */
-exports.getAllPets = async () => {
-    const ins = await Models.Pet.findAll();
-    // console.log(ins);
-    if (!ins || ins.length === 0) {
-        return "站内无宠物"
-    }
-    const petData = await Promise.all(
-        ins.map(async (element) => {
-            const json = element.toJSON();
-            if (json.PetImg) {
-                json.img = await commonServeFunc.getImg(json.PetImg);
-            }
-            return json;
-        })
-    );
+exports.getAllPets = async (obj) => {
+    // console.log(obj);
+    try {
 
-    return petData;
+        const ins = await Models.Pet.findAll({
+            limit: obj.pageSize ? +obj.pageSize : null,
+            offset: obj.pageSize && obj.page ? (+obj.page - 1) * +obj.pageSize : null,
+        });
+        // console.log(ins);
+        if (!ins || ins.length === 0) {
+            return "站内无宠物"
+        }
+        const petData = await Promise.all(
+            ins.map(async (element) => {
+                const json = element.toJSON();
+                if (json.PetImg) {
+                    json.img = await commonServeFunc.getImg(json.PetImg);
+                }
+                return json;
+            })
+        );
+
+        return petData;
+    } catch (error) {
+        console.log(error);
+    }
 }

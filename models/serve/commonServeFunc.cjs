@@ -1,4 +1,3 @@
-
 const Models = require("./servicesComon.cjs")
 const {
     petType2Text,
@@ -62,14 +61,14 @@ exports.upload = (fileName, fileData) => {
     });
 }
 exports.getImg = async (path) => {
-    console.log(111);
-    if(!path){
+    // console.log(111);
+    if (!path) {
         return null
     }
     // console.log(123);
-    const name = path.replace(/\\/g,"/") +'.png'
+    const name = path.replace(/\\/g, "/") + '.png'
     const data = await fs.promises.readFile(name);
-    return data.toString('base64')
+    return `data:image/png;base64,${data.toString('base64')}`
 
 
 }
@@ -148,21 +147,43 @@ exports.createAdmin = async (obj) => {
 /**
  * 通过电话获取个人信息
  * 第二个参数代表返回的时实例还是json转换后的对象，默认返回json对象，传入true返回实例
+ * 第三个区分用户和管理员 1用户 2管理员
  * @param {String} Tel 
  * @returns 查询结果
  */
-exports.getInfoByTel = async (Tel, not = false) => {
-    const ins =
-        (await Models.Admin.findOne({
-            where: {
-                ATel: Tel,
-            }
-        })) ||
-        (await Models.PetMaster.findOne({
+exports.getInfoByTel = async (Tel, user = 100, not = false) => {
+    let ins;
+    console.log(user);
+    if (user == 1) {
+        console.log(10);
+        ins = (await Models.PetMaster.findOne({
             where: {
                 MTel: Tel
             }
         }))
+
+    }
+    else if (user == 2) {
+        console.log(20);
+        ins = (await Models.Admin.findOne({
+            where: {
+                ATel: Tel,
+            }
+        }))
+    } else {
+        console.log(30);
+        ins =
+            (await Models.Admin.findOne({
+                where: {
+                    ATel: Tel,
+                }
+            })) ||
+            (await Models.PetMaster.findOne({
+                where: {
+                    MTel: Tel
+                }
+            }))
+    }
     if (not) {
         return ins
     }
@@ -197,7 +218,7 @@ exports.getAdminByTel = async (ATel, useOriginal = false) => {
  */
 exports.login = async (obj) => {
     console.log(obj);
-    if (!await this.getInfoByTel(obj.tel)) {
+    if (!await this.getInfoByTel(obj.tel, obj.user)) {
         console.log("未找到用户");
         return {
             msg: "未找到用户",
@@ -206,19 +227,47 @@ exports.login = async (obj) => {
         }
     }
     obj.pwd = Models.md5(obj.pwd)
-    const ins = await Models.Admin.findOne({
-            where: {
-                ATel: obj.tel,
-                APwd: obj.pwd
-            }
-        }) ||
-        await Models.PetMaster.findOne({
+    let ins;
+    if (obj.user == 1) {
+        ins = await Models.PetMaster.findOne({
             where: {
                 MTel: obj.tel,
                 MPwd: obj.pwd
             }
         })
-    // console.log(ins?.toJSON(), 111111);
+    }
+    else if (obj.user == 2) {
+        ins = await Models.Admin.findOne({
+            where: {
+                ATel: obj.tel,
+                APwd: obj.pwd
+            }
+        })
+    } else {
+        ins = await Models.Admin.findOne({
+                where: {
+                    ATel: obj.tel,
+                    APwd: obj.pwd
+                }
+            }) ||
+            await Models.PetMaster.findOne({
+                where: {
+                    MTel: obj.tel,
+                    MPwd: obj.pwd
+                }
+            })
+    }
+    // console.log(ins?.toJSON(), 111111,ins ? {
+    //     data: ins,
+    //     msg: "登陆成功",
+    //     isSuccessful: true,
+    //     state: 200
+    // } : {
+    //     data: {},
+    //     msg: "密码错误",
+    //     isSuccessful: false,
+    //     state: 401
+    // });
     return ins ? {
         data: ins,
         msg: "登陆成功",
@@ -242,6 +291,9 @@ exports.getIdByTel = async (tel) => {
 }
 
 const sequelize = require('sequelize');
+const {
+    log
+} = require("@tensorflow/tfjs");
 
 // 查询表中不同字母的种类数量
 exports.uniqueLettersCount = async () => {

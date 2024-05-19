@@ -127,7 +127,7 @@ app.all("/api/login", async (req, res) => {
     res.send({
         ...ins,
         query: req.query,
-        isSuccessful: !!ins
+        // isSuccessful: !!ins
     })
 })
 
@@ -208,6 +208,20 @@ app.all("/api/master/upDataMasterTel", async (req, res) => {
 })
 
 
+app.all("/api/master/getMasterByTel", async (req, res) => {
+    let ins;
+    try {
+        ins = await masterServe.getMasterByTel(req.query.tel)
+    } catch (error) {
+        ins = error;
+    }
+    console.log(ins, req.query);
+    res.send({
+        data: ins,
+        msg: ins.msg,
+        query: req.query
+    })
+})
 app.all("/api/master/linkPet", async (req, res) => {
     let ins;
     try {
@@ -298,13 +312,12 @@ app.all("/api/pet/getAllPets", async (req, res) => {
     // const masterActive = 
     let ins;
     try {
-        ins = await petServe.getAllPets()
+        ins = await petServe.getAllPets(req.query)
     } catch (error) {
         ins = error;
     }
-    console.log(req.query, ins);
+    // console.log(req.query, ins);
     res.send({
-
         data: ins,
         query: req.query
     })

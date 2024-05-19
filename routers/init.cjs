@@ -58,7 +58,7 @@ app.all('/api/admin/login', async (req, res) => {
             uPwd: req.query.uPwd,
             uTel: req.query.uTel,
         })
-        console.log(111, ins);
+        // console.log(111, ins);
         if (ins instanceof Error) {
             status = -1,
                 message = ins.message,
