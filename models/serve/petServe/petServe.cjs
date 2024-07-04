@@ -6,11 +6,18 @@ const {
     baseUrl
 } = require("../../../savefile.cjs")
 const FileMap = {
+    sex: "PSex",
+    description: "PDescription",
+    birth: "PBirth",
+    health: "PHealth",
+    sex: "PSex",
     name: "PName",
     master: "PetMaster",
+    masterId: "PetMasterId",
     species: "species",
     serial: "serial",
     img_B: "PetImg",
+    vaccine: "PVaccine"
 }
 const {
     petText2Type,
@@ -26,7 +33,6 @@ const SK = "9ykC2KmFOJgp1ZQgAFlVstjKQ90MZamA";
  * @return string 鉴权签名信息（Access Token）
  */
 function getAccessToken() {
-
     let options = {
         'method': 'POST',
         'url': 'https://aip.baidubce.com/oauth/2.0/token?grant_type=client_credentials&client_id=' + AK + '&client_secret=' + SK,
@@ -45,7 +51,6 @@ const tocken = getAccessToken();
 
 
 exports.search = async (base64, res) => {
-    // console.log(base64);
     options = {
         'method': 'POST',
         'url': 'https://aip.baidubce.com/rest/2.0/image-classify/v1/realtime_search/similar/search?access_token=' + await getAccessToken(),
@@ -59,11 +64,27 @@ exports.search = async (base64, res) => {
         }
     };
 
-    request(options, function (error, response) {
+    request(options, async (error, response) => {
         if (error) throw new Error(error);
-        console.log(response.body);
+        const body = JSON.parse(response.body);
+        const brief = body.result[0].brief;
+        const petData = await Promise.all(
+            body.result.map(async (element) => {
+                const serialFull = JSON.parse(element.brief).serialFull;
+                const serial = JSON.parse(element.brief).serial;
+                let ins = null;
+                if (serialFull) {
+                    element.img = await commonServeFunc.getImg(serialFull);
+                    ins = await this.getPetBySerial(serial)
+                }
+                return {
+                    element,
+                    ins
+                };
+            })
+        );
         res.send({
-            data: JSON.parse(response.body)
+            data: petData
         })
     });
 }
@@ -154,43 +175,101 @@ exports.getPetByMasterTel = async (tel) => {
  * @param {Object} obj {species,serial,[name,master]} 
  * @returns 创建结果
  */
+
+const sharp = require('sharp');
+async function compressImage(originalBuffer, originalWidth, originalHeight) {
+    const maxSize = 1.5 * 1024 * 1024; // 设置压缩后的目标大小为1.5MB
+    
+    // 计算缩放比例,保持原始比例
+    const scaleRatio = Math.min(
+      maxSize / (originalBuffer.length),
+      1
+    );
+    
+    const newWidth = Math.floor(originalWidth * scaleRatio);
+    const newHeight = Math.floor(originalHeight * scaleRatio);
+    let data =
+    await sharp(originalBuffer)
+      .resize(newWidth, newHeight)
+      .jpeg({ quality: 80 }) // 设置压缩质量为80%
+      .toBuffer()
+      .then(compressedData => {
+        const compressedBase64 = compressedData.toString('base64');
+        console.log(`压缩后的图片大小为: ${compressedBase64.length / 1024 / 1024} MB`);
+        // 后续可以将compressedBase64保存或使用
+        // console.log("compressedData",compressedData);
+        return compressedData
+      })
+      .catch(err => {
+        console.error('压缩图片时出错:', err);
+      });
+      return data;
+  }
+  
 exports.addPet = async (obj) => {
-    // console.log(petText2Type[obj.species], obj);
     const aaa = obj.img.split(",")[1]
-    img = Buffer.from(aaa, 'base64');
+    const originalBuffer = Buffer.from(aaa, 'base64')
+    let img
+    try {
+        img = await sharp(originalBuffer)
+        .metadata()
+            .then(async (metadata) => {
+                const { width, height } = metadata;
+                // 进行下一步压缩
+                const imgs = await compressImage(originalBuffer, width, height)
+                // console.log("imgs",imgs);
+                return imgs;
+              })
+              .catch(err => {
+                console.error('获取图像元数据时出错:', err);
+              });
+    } catch (error) {
+        console.log(error);
+    }
+    // await sharp(Buffer.from(aaa, 'base64'))
+    //     .resize(800, 600) // 设置压缩后的尺寸
+    //     .jpeg({quality: 80}) // 设置压缩质量为80%
+    //     .toBuffer()
+    //     .then(compressedData => {
+    //         // const compressedBase64 = compressedData.toString('base64');
+    //         img = compressedData;
+    //         console.log(`压缩后的图片大小为: ${Buffer.byteLength(compressedData) / 1024 / 1024} MB`);
+    //         // 后续可以将compressedBase64保存或使用
+    //     })
+    //     .catch(err => {
+    //         console.error('压缩图片时出错:', err);
+    //     });
     serial = `${petText2Type[obj.species]}-${commonServeFunc.getRandomNum()}`
     obj.img_B = baseUrl + `\\` + serial;
     const data = commonServeFunc.isMap(FileMap, obj);
     data.serial = serial;
     data.img = baseUrl + `\\` + serial;
-    // console.log(data, 666);
     const ins = await Models.Pet.create(data);
+    // console.log(ins,img);
     if (ins) {
         base64ToFile(img, serial);
-        // console.log(tocken, 556666);
-        console.log(img);
+        // console.log(img);
         let options = {
             'method': 'POST',
             'url': 'https://aip.baidubce.com/rest/2.0/image-classify/v1/realtime_search/similar/add?access_token=' + await getAccessToken(),
             'headers': {
                 'Content-Type': 'application/x-www-form-urlencoded'
             },
-            // image 可以通过 getFileContentAsBase64("C:\fakepath\微信图片_20231009164814.png") 方法获取,
             form: {
                 'image': aaa, //base64数据
-                'brief': `{"serial":${serial}}`
+                'brief': JSON.stringify({
+                    "serialFull": data.img,
+                    "serial": serial
+                })
             }
         };
-        console.log(1122);
+        // console.log(1122);
         request(options, function (error, response) {
             if (error) throw new Error(error);
-            console.log(response.body);
+            // console.log(response.body);
         });
     }
-    // if(ins){
     const res = commonServeFunc.upload(data.serial, obj.img);
-    console.log(res, 777);
-    // }
     return ins && ins.toJSON()
 }
 
@@ -211,7 +290,7 @@ exports.deletOnePet = async (serial) => {
     const ins = await Models.Pet.destroy({
         where: {
             serial: serial
-        }
+        },
     })
     return ins === 0 ? `未找到编号为${serial}的宠物` : `成功删除了${ins}个宠物`
 }
@@ -244,9 +323,9 @@ exports.updatePet = async (obj) => {
     }
     let ins
     if (obj.PetMasterTel) {
-        const master = await commonServeFunc.getInfoByTel(obj.PetMasterTel, true)
+        const master = await commonServeFunc.getInfoByTel(obj.PetMasterTel, 100, true)
         if (!(master && master.toJSON && master.toJSON())) {
-            return "未找到用户"
+            return "未找到用户1111"
         }
         await Pet.setPetMaster(master.id);
         ins = await Models.Pet.update(obj, {
@@ -267,7 +346,7 @@ exports.updatePet = async (obj) => {
             },
         })
     }
-    console.log(ins);
+    console.log(ins, 112233);
     return ins
 }
 
@@ -322,6 +401,7 @@ exports.getAllPetByType = async (obj, not = false) => {
         })
         // console.log(totalIns);
         // const total = totalIns.length;
+        // console.log(obj.pageSize && obj.page ? (+obj.page - 1) * +obj.pageSize : null,obj.pageSize ? +obj.pageSize : null);
         const ins = await Models.Pet.findAll({
             where: {
                 species: petType2Text[petText2Type2[obj.species]],
@@ -338,7 +418,7 @@ exports.getAllPetByType = async (obj, not = false) => {
             return "未查询到"
         }
         if (not) {
-            console.log(ins, 6666);
+            // console.log(ins, 6666);
             return {
                 ins: ins,
                 total: totalIns.length
@@ -346,6 +426,7 @@ exports.getAllPetByType = async (obj, not = false) => {
         }
         // const data = ins.toJSON()
         // console.log(ins, ins.toJSON());
+        // console.log(11111);
         const petData = await Promise.all(
             ins.map(async (element) => {
                 const item = element.toJSON();
@@ -372,10 +453,16 @@ exports.getAllPetByType = async (obj, not = false) => {
 exports.getAllPets = async (obj) => {
     // console.log(obj);
     try {
-
+        let where = obj.noneMaster ? {
+            PetMasterId: null,
+        } : {}
+        const total = (await Models.Pet.findAll({
+            where
+        })).length
         const ins = await Models.Pet.findAll({
             limit: obj.pageSize ? +obj.pageSize : null,
             offset: obj.pageSize && obj.page ? (+obj.page - 1) * +obj.pageSize : null,
+            where,
         });
         // console.log(ins);
         if (!ins || ins.length === 0) {
@@ -390,8 +477,11 @@ exports.getAllPets = async (obj) => {
                 return json;
             })
         );
-
-        return petData;
+        console.log(total, where);
+        return {
+            data: petData,
+            total
+        };
     } catch (error) {
         console.log(error);
     }

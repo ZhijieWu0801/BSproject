@@ -11,16 +11,13 @@ const Pet = sequelize.define(
       allowNull: true,
       comment: `宠物名字`,
     },
-
-
-
     PVaccine: {
       type: DataTypes.STRING,
       allowNull: true,
       comment: `疫苗情况`,
     },
     PBirth: {
-      type: DataTypes.TIME,
+      type: DataTypes.DATE,
       allowNull: true,
       comment: `出生日期`,
     },
@@ -39,9 +36,6 @@ const Pet = sequelize.define(
       allowNull: true,
       comment: `宠物性别`,
     },
-
-
-
     species: {
       type: DataTypes.STRING,
       allowNull: false,
@@ -54,7 +48,7 @@ const Pet = sequelize.define(
       unique: true,
     },
     PetMasterId: {
-      type: DataTypes.INTEGER, // Assuming the id in PetMaster is an integer
+      type: DataTypes.INTEGER, 
       allowNull: true,
       comment: `宠物主人`,
       references: {
@@ -80,10 +74,8 @@ const Pet = sequelize.define(
     paranoid: true,
   }
 );
-
 PetMaster.hasMany(Pet);
 Pet.belongsTo(PetMaster, { foreignKey: 'PetMasterId', as: 'petMaster' });
 Admin.hasMany(Pet);
 Pet.belongsTo(Admin, { foreignKey: 'AdminId', as: 'admin' });
-
 module.exports = Pet;

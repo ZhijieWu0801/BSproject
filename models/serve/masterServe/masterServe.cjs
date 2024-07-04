@@ -201,3 +201,40 @@ exports.getMasterByTel = async (tel) => {
     }
     return ins.toJSON();
 }
+
+/**
+ * 
+ * @param {*} tel 
+ * @returns 
+ */
+exports.getMasterPetByTel = async (tel) => {
+    console.log(tel);
+    const ins = await Models.PetMaster.findOne({
+        where:{
+            MTel:tel
+        },
+        include:{
+            model:Models.Pet,
+            as:"Pets"
+        }
+    })
+    if (!ins) {
+        return []
+    }
+    const list = ins.toJSON()
+    
+    console.log(list.Pets,789);
+    if(!list.Pets){
+        return []
+    }
+    const petData = await Promise.all(
+        list.Pets.map(async (element) => {
+            console.log(element.PetImg,123456);
+            if (element.PetImg) {
+                element.img = await commonServeFunc.getImg(element.PetImg);
+            }
+            return element;
+        })
+    );
+    return petData
+}

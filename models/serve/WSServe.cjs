@@ -43,7 +43,7 @@ wss.on('connection', function connection(ws) {
 
 
 
-        if (standing === 100) {//100代表用户
+        if (standing === 100) { //100代表用户
             toAdmin(message, Admin)
         }
         if (standing === 0) {
@@ -209,16 +209,16 @@ function toUser(message, clients) {
 
     // 解码二进制数据并转换为字符串
     const utf8String = decoder.decode(binaryData);
-    
+
     const obj = JSON.parse(utf8String);
     // const reqMessage = JSON.stringify(utf8String.message);
-    console.log(obj,111122);
+    // console.log(obj,111122);
     if (!obj.message) {
         return
     }
     let userWs = null;
     for (let i = 0; i < clients.length; i++) {
-        console.log(clients,456);
+        // console.log(clients,456);
         if (clients[i].id === obj.message.masterTel) {
             userWs = clients[i].ws;
             break

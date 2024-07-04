@@ -99,22 +99,6 @@ app.all("/api/pet/uniqueLettersCount", async (req, res) => {
         query: req.query
     })
 })
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 app.all("/api/login", async (req, res) => {
     let ins;
     try {
@@ -122,12 +106,9 @@ app.all("/api/login", async (req, res) => {
     } catch (error) {
         ins = error;
     }
-    // console.log("---",commonServe.getToken());
-    // console.log(req.query, ins);
     res.send({
         ...ins,
         query: req.query,
-        // isSuccessful: !!ins
     })
 })
 
@@ -257,6 +238,21 @@ app.all("/api/master/disconnectPetLink", async (req, res) => {
     })
 })
 
+app.all("/api/master/getMasterPetByTel", async (req, res) => {
+    let ins;
+    try {
+        ins = await masterServe.getMasterPetByTel(req.query.tel)
+    } catch (error) {
+        ins = error;
+    }
+    console.log(ins, req.query);
+    res.send({
+        data: ins,
+        msg: ins,
+        query: req.query
+    })
+})
+
 
 
 
@@ -278,45 +274,39 @@ app.all('/upload', async (req, res) => {
 app.all("/api/pet/getImg", async (req, res) => {
     const ins = await commonServe.getImg(req, res)
 
-        res.send({
-            img: ins
-        })
+    res.send({
+        img: ins
+    })
 })
 /**
  * 相似图片检索
  */
 app.all("/api/pet/search", async (req, res) => {
-    // console.log(req);
     const ins = await petServe.search(req.query.img, res).then(r => {
-
         // res.send({
         //     img: r
         // })
     })
 })
 app.all("/api/pet/addPet", async (req, res) => {
-    // const masterActive = 
     let ins;
     try {
         ins = await petServe.addPet(req.query)
     } catch (error) {
         ins = error;
     }
-    // console.log(req.query);
     res.send({
         msg: ins,
         query: req.query
     })
 })
 app.all("/api/pet/getAllPets", async (req, res) => {
-    // const masterActive = 
     let ins;
     try {
         ins = await petServe.getAllPets(req.query)
     } catch (error) {
         ins = error;
     }
-    // console.log(req.query, ins);
     res.send({
         data: ins,
         query: req.query
@@ -324,7 +314,6 @@ app.all("/api/pet/getAllPets", async (req, res) => {
 })
 
 app.all("/api/pet/getPetByMasterTel", async (req, res) => {
-    // console.log(1111);
     let ins;
     try {
         ins = await petServe.getPetByMasterTel(req.query.tel)
@@ -332,7 +321,6 @@ app.all("/api/pet/getPetByMasterTel", async (req, res) => {
         ins = error;
     }
     const typeofIns = typeof ins
-    // console.log(req.query.tel, typeofIns);
     res.send({
         data: ins,
         msg: typeofIns !== "string" ? (typeofIns === "object" && ins.length ? "查询成功" : "用户无宠物") : ins,
@@ -346,9 +334,7 @@ app.all("/api/pet/getPetBySerial", async (req, res) => {
     } catch (error) {
         ins = error;
     }
-    const typeofIns = typeof ins
-    // return 
-    // console.log(req.query.tel, typeofIns, JSON.stringify(ins));
+    const typeofIns = typeof ins;
     res.send({
         data: ins,
         msg: typeofIns !== "string" ? (typeofIns === "object" && ins ? "查询成功" : "站内无该宠物") : ins,
@@ -358,7 +344,6 @@ app.all("/api/pet/getPetBySerial", async (req, res) => {
 
 
 app.all("/api/pet/getAllPetByType", async (req, res) => {
-    // console.log(1111);
     let ins;
     try {
         ins = await petServe.getAllPetByType(req.query)
@@ -366,7 +351,6 @@ app.all("/api/pet/getAllPetByType", async (req, res) => {
         ins = error;
     }
     const typeofIns = typeof ins
-    // console.log(ins,typeofIns,ins.length);
     res.send({
         data: ins.ins,
         total: ins.total,

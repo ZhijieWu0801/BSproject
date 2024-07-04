@@ -257,17 +257,6 @@ exports.login = async (obj) => {
                 }
             })
     }
-    // console.log(ins?.toJSON(), 111111,ins ? {
-    //     data: ins,
-    //     msg: "登陆成功",
-    //     isSuccessful: true,
-    //     state: 200
-    // } : {
-    //     data: {},
-    //     msg: "密码错误",
-    //     isSuccessful: false,
-    //     state: 401
-    // });
     return ins ? {
         data: ins,
         msg: "登陆成功",
